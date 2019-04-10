@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">ActivityMonitoring</string>
+<string name="app_name">ActivityMonitoring</string>
+<string name="label_accelerometer">Accelerometer: x=%1$.2f, y=%2$.2f, z=%3$.2f</string>
+<string name="error_no_sensor">No sensor</string>
 </resources>
