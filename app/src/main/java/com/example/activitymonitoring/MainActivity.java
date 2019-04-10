@@ -9,8 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import java.util.List;
-
 public class MainActivity
     extends AppCompatActivity implements SensorEventListener {
 
@@ -21,7 +19,7 @@ public class MainActivity
     private Sensor mAccelerometer;
 
     // TextViews to display current sensor values
-    private TextView mTextSensorAccelerometer;
+    private TextView mSensorAccelerometer;
 
 
     @Override
@@ -31,7 +29,7 @@ public class MainActivity
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        mTextSensorAccelerometer = (TextView) findViewById(R.id.label_acceleromter);
+        mSensorAccelerometer = (TextView) findViewById(R.id.label_acceleromter);
 
         // assign sensor instances
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -39,10 +37,10 @@ public class MainActivity
         // Get the error message from string resources.
         String sensor_error = getResources().getString(R.string.error_no_sensor);
 
-        // If either mSensorLight or mSensorProximity are null, those sensors
-        // are not available in the device.  Set the text to the error message
-        if (mTextSensorAccelerometer == null) {
-            mTextSensorAccelerometer.setText(sensor_error);
+        // If mSensorAccelerometer is null, the sensor
+        // is not available in the device.  Set the text to the error message
+        if (mSensorAccelerometer == null) {
+            mSensorAccelerometer.setText(sensor_error);
         }
 
     }
@@ -75,7 +73,7 @@ public class MainActivity
                 x = sensorEvent.values[0];
                 y = sensorEvent.values[1];
                 z = sensorEvent.values[2];
-                mTextSensorAccelerometer.setText(getResources().getString(
+                mSensorAccelerometer.setText(getResources().getString(
                     R.string.label_accelerometer, x, y, z));
 
             default:
