@@ -5,14 +5,24 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class MainActivity
     extends AppCompatActivity implements SensorEventListener {
@@ -26,6 +36,15 @@ public class MainActivity
     private RadioGroup radioActivityGroup;
     private RadioButton radioActivityButton;
     private Button btnRecord;
+
+    EditText inputText;
+    TextView response;
+    Button saveButton,readButton;
+
+    private String filename = "SampleFile.txt";
+    private String filepath = "MyFileStorage";
+    File myExternalFile;
+    String myData = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,29 +66,71 @@ public class MainActivity
             mSensorAccelerometerTextView.setText(sensor_error);
         }
 
-        addListenerOnButton();
-    }
+        inputText = (EditText) findViewById(R.id.myInputText);
+        response = (TextView) findViewById(R.id.response);
 
-    public void addListenerOnButton() {
 
-        radioActivityGroup = findViewById(R.id.radioActivity);
-        btnRecord = findViewById(R.id.btnRecord);
-
-        btnRecord.setOnClickListener(new View.OnClickListener() {
-
+        saveButton =
+                (Button) findViewById(R.id.btnRecord);
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // get selected radio button from radioGroup
-                int selectedId = radioActivityGroup.getCheckedRadioButtonId();
-
-                // find the radiobutton by returned id
-                radioActivityButton = findViewById(selectedId);
-
-                Toast.makeText(MainActivity.this,
-                        radioActivityButton.getText(), Toast.LENGTH_SHORT).show();
+                try {
+                    FileOutputStream fos = new FileOutputStream(myExternalFile, true);
+                    fos.write(inputText.getText().toString().getBytes());
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                inputText.setText("");
+                response.setText("SampleFile.txt saved to External Storage...");
             }
         });
+
+        readButton = (Button) findViewById(R.id.btnStop);
+        readButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    FileInputStream fis = new FileInputStream(myExternalFile);
+                    DataInputStream in = new DataInputStream(fis);
+                    BufferedReader br =
+                            new BufferedReader(new InputStreamReader(in));
+                    String strLine;
+                    while ((strLine = br.readLine()) != null) {
+                        myData = myData + strLine;
+                    }
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                inputText.setText(myData);
+                response.setText("SampleFile.txt data retrieved from External Storage...");
+            }
+        });
+
+        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
+            saveButton.setEnabled(false);
+        }
+        else {
+            myExternalFile = new File(getExternalFilesDir(filepath), filename);
+        }
+    }
+
+    private static boolean isExternalStorageReadOnly() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isExternalStorageAvailable() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(extStorageState)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -109,9 +170,5 @@ public class MainActivity
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-    }
-
-    public void AppendDataToFile(double x, double y, double z){
-
     }
 }
