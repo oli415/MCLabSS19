@@ -14,15 +14,16 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 public class MainActivity
     extends AppCompatActivity implements SensorEventListener {
@@ -37,12 +38,10 @@ public class MainActivity
     private RadioButton radioActivityButton;
     private Button btnRecord;
 
-    EditText inputText;
-    TextView response;
-    Button saveButton,readButton;
+    Button recordButton, stopButton;
 
-    private String filename = "SampleFile.txt";
-    private String filepath = "MyFileStorage";
+    private String filename = "AM_data.txt";
+    private String filepath = "ActivityMonitoring";
     File myExternalFile;
     String myData = "";
 
@@ -66,51 +65,38 @@ public class MainActivity
             mSensorAccelerometerTextView.setText(sensor_error);
         }
 
-        inputText = (EditText) findViewById(R.id.myInputText);
-        response = (TextView) findViewById(R.id.response);
 
-
-        saveButton =
+        recordButton =
                 (Button) findViewById(R.id.btnRecord);
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     FileOutputStream fos = new FileOutputStream(myExternalFile, true);
-                    fos.write(inputText.getText().toString().getBytes());
-                    fos.close();
+                    OutputStreamWriter osw = new OutputStreamWriter(fos);
+                    double x = 0.2;
+                    Long tsLong = System.currentTimeMillis()*1000;
+                    String ts = tsLong.toString();
+                    String separator = System.getProperty("line.separator");
+                    osw.write("0,"+"Jogging,"+ts+","+x);
+                    osw.append(separator);
+                    osw.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                inputText.setText("");
-                response.setText("SampleFile.txt saved to External Storage...");
             }
         });
 
-        readButton = (Button) findViewById(R.id.btnStop);
-        readButton.setOnClickListener(new View.OnClickListener() {
+        stopButton = (Button) findViewById(R.id.btnStop);
+        stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    FileInputStream fis = new FileInputStream(myExternalFile);
-                    DataInputStream in = new DataInputStream(fis);
-                    BufferedReader br =
-                            new BufferedReader(new InputStreamReader(in));
-                    String strLine;
-                    while ((strLine = br.readLine()) != null) {
-                        myData = myData + strLine;
-                    }
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                inputText.setText(myData);
-                response.setText("SampleFile.txt data retrieved from External Storage...");
+
             }
         });
 
         if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
-            saveButton.setEnabled(false);
+            recordButton.setEnabled(false);
         }
         else {
             myExternalFile = new File(getExternalFilesDir(filepath), filename);
