@@ -7,7 +7,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity
     extends AppCompatActivity implements SensorEventListener {
@@ -17,6 +22,10 @@ public class MainActivity
 
     // TextViews to display current sensor values
     private TextView mSensorAccelerometerTextView;
+
+    private RadioGroup radioActivityGroup;
+    private RadioButton radioActivityButton;
+    private Button btnRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +46,30 @@ public class MainActivity
         if (mAccelerometer == null) {
             mSensorAccelerometerTextView.setText(sensor_error);
         }
+
+        addListenerOnButton();
+    }
+
+    public void addListenerOnButton() {
+
+        radioActivityGroup = findViewById(R.id.radioActivity);
+        btnRecord = findViewById(R.id.btnRecord);
+
+        btnRecord.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                // get selected radio button from radioGroup
+                int selectedId = radioActivityGroup.getCheckedRadioButtonId();
+
+                // find the radiobutton by returned id
+                radioActivityButton = findViewById(selectedId);
+
+                Toast.makeText(MainActivity.this,
+                        radioActivityButton.getText(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -68,6 +101,7 @@ public class MainActivity
                 mSensorAccelerometerTextView.setText(getResources().getString(
                     R.string.label_accelerometer, x, y, z));
 
+
             default:
                 // do nothing
         }
@@ -77,4 +111,7 @@ public class MainActivity
     public void onAccuracyChanged(Sensor sensor, int i) {
     }
 
+    public void AppendDataToFile(double x, double y, double z){
+
+    }
 }

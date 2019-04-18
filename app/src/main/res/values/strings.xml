@@ -2,4 +2,12 @@
 <string name="app_name">ActivityMonitoring</string>
 <string name="label_accelerometer">Accelerometer: x=%1$.2f, y=%2$.2f, z=%3$.2f</string>
 <string name="error_no_sensor">No sensor</string>
+<string name="radio_sitting">Sitting</string>
+<string name="radio_standing">Standing</string>
+<string name="radio_walking">Walking</string>
+<string name="radio_upstairs">Upstairs</string>
+<string name="radio_downstairs">Downstairs</string>
+<string name="radio_jogging">Jogging</string>
+<string name="btn_record">Record</string>
+<string name="btn_stop">Stop</string>
 </resources>
