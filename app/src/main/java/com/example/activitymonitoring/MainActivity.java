@@ -12,15 +12,11 @@ import android.widget.TextView;
 public class MainActivity
     extends AppCompatActivity implements SensorEventListener {
 
-
     private SensorManager mSensorManager;
-
-
     private Sensor mAccelerometer;
 
     // TextViews to display current sensor values
-    private TextView mSensorAccelerometer;
-
+    private TextView mSensorAccelerometerTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +24,7 @@ public class MainActivity
         setContentView(R.layout.activity_main);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-        mSensorAccelerometer = (TextView) findViewById(R.id.label_acceleromter);
+        mSensorAccelerometerTextView = findViewById(R.id.label_acceleromter);
 
         // assign sensor instances
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -37,14 +32,12 @@ public class MainActivity
         // Get the error message from string resources.
         String sensor_error = getResources().getString(R.string.error_no_sensor);
 
-        // If mSensorAccelerometer is null, the sensor
+        // If mAccelerometer is null, the sensor
         // is not available in the device.  Set the text to the error message
-        if (mSensorAccelerometer == null) {
-            mSensorAccelerometer.setText(sensor_error);
+        if (mAccelerometer == null) {
+            mSensorAccelerometerTextView.setText(sensor_error);
         }
-
     }
-
 
     @Override
     protected void onStart() {
@@ -64,8 +57,7 @@ public class MainActivity
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        int sensorType;
-        sensorType = sensorEvent.sensor.getType();
+        int sensorType = sensorEvent.sensor.getType();
         double x, y, z;
 
         switch (sensorType) {
@@ -73,17 +65,16 @@ public class MainActivity
                 x = sensorEvent.values[0];
                 y = sensorEvent.values[1];
                 z = sensorEvent.values[2];
-                mSensorAccelerometer.setText(getResources().getString(
+                mSensorAccelerometerTextView.setText(getResources().getString(
                     R.string.label_accelerometer, x, y, z));
 
             default:
                 // do nothing
-}
-
+        }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-
     }
+
 }
