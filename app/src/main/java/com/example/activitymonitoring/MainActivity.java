@@ -5,28 +5,22 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class MainActivity
-    extends AppCompatActivity implements SensorEventListener {
+        extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -36,9 +30,8 @@ public class MainActivity
 
     private RadioGroup radioActivityGroup;
     private RadioButton radioActivityButton;
-    private Button btnRecord;
-
-    Button recordButton, stopButton;
+    private Button btnRecord, btnStop;
+    String selectedActivity = "N/A";
 
     private String filename = "AM_data.txt";
     private String filepath = "ActivityMonitoring";
@@ -65,40 +58,33 @@ public class MainActivity
             mSensorAccelerometerTextView.setText(sensor_error);
         }
 
-
-        recordButton =
-                (Button) findViewById(R.id.btnRecord);
-        recordButton.setOnClickListener(new View.OnClickListener() {
+        radioActivityGroup = findViewById(R.id.radioActivity);
+        btnRecord = findViewById(R.id.btnRecord);
+        btnRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    FileOutputStream fos = new FileOutputStream(myExternalFile, true);
-                    OutputStreamWriter osw = new OutputStreamWriter(fos);
-                    double x = 0.2;
-                    Long tsLong = System.currentTimeMillis()*1000;
-                    String ts = tsLong.toString();
-                    String separator = System.getProperty("line.separator");
-                    osw.write("0,"+"Jogging,"+ts+","+x);
-                    osw.append(separator);
-                    osw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                // get selected radio button from radioGroup
+                int selectedId = radioActivityGroup.getCheckedRadioButtonId();
+
+                // find the radiobutton by returned id
+                radioActivityButton = findViewById(selectedId);
+
+                selectedActivity = radioActivityButton.getText().toString();
             }
         });
 
-        stopButton = (Button) findViewById(R.id.btnStop);
-        stopButton.setOnClickListener(new View.OnClickListener() {
+        btnStop = findViewById(R.id.btnStop);
+        btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                selectedActivity = "N/A";
             }
         });
 
         if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
-            recordButton.setEnabled(false);
-        }
-        else {
+            btnRecord.setEnabled(false);
+        } else {
+            //Internal storage\Android\data\com.example.activitymonitoring\files\ActivityMonitoring\AM_data.txt
             myExternalFile = new File(getExternalFilesDir(filepath), filename);
         }
     }
@@ -146,8 +132,11 @@ public class MainActivity
                 y = sensorEvent.values[1];
                 z = sensorEvent.values[2];
                 mSensorAccelerometerTextView.setText(getResources().getString(
-                    R.string.label_accelerometer, x, y, z));
+                        R.string.label_accelerometer, x, y, z));
 
+                if (!selectedActivity.equals("N/A")) {
+                    AppendDataToFile(x, y, z);
+                }
 
             default:
                 // do nothing
@@ -156,5 +145,20 @@ public class MainActivity
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
+    public void AppendDataToFile(double x, double y, double z) {
+        try {
+            FileOutputStream fos = new FileOutputStream(myExternalFile, true);
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            Long tsLong = System.currentTimeMillis() * 1000;
+            String ts = tsLong.toString();
+            String separator = System.getProperty("line.separator");
+            osw.write("0," + selectedActivity + "," + ts + "," + x + "," + y + "," + z);
+            osw.append(separator);
+            osw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

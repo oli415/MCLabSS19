@@ -79,26 +79,6 @@
 
     </RadioGroup>
 
-    <EditText
-        android:id="@+id/myInputText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:ems="10"
-        android:gravity="top|left"
-        android:inputType="textMultiLine"
-        android:lines="5"
-        android:minLines="3"
-        app:layout_constraintBottom_toTopOf="@+id/response"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnStop">
-
-        <requestFocus />
-    </EditText>
-
     <Button
         android:id="@+id/btnRecord"
         android:layout_width="wrap_content"
@@ -121,16 +101,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnRecord" />
 
-    <TextView
-        android:id="@+id/response"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginLeft="52dp"
-        android:layout_marginTop="104dp"
-        android:padding="5dp"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnStop" />
 </android.support.constraint.ConstraintLayout>
