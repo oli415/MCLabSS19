@@ -27,6 +27,7 @@ public class MainActivity
 
     // TextViews to display current sensor values
     private TextView mSensorAccelerometerTextView;
+    private TextView mRecordStatusTextView;
 
     private RadioGroup radioActivityGroup;
     private RadioButton radioActivityButton;
@@ -38,6 +39,8 @@ public class MainActivity
     File myExternalFile;
     String myData = "";
 
+    public static final int DEFAULT_HEIGHT = 5;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,7 @@ public class MainActivity
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensorAccelerometerTextView = findViewById(R.id.label_acceleromter);
+        mRecordStatusTextView = (TextView) findViewById(R.id.textRecordStatus);
 
         // assign sensor instances
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -70,6 +74,7 @@ public class MainActivity
                 radioActivityButton = findViewById(selectedId);
 
                 selectedActivity = radioActivityButton.getText().toString();
+                mRecordStatusTextView.setText("recording: " + selectedActivity);
             }
         });
 
@@ -78,6 +83,8 @@ public class MainActivity
             @Override
             public void onClick(View v) {
                 selectedActivity = "N/A";
+
+                mRecordStatusTextView.setText("not recording: ");
             }
         });
 
