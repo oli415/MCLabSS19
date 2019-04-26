@@ -35,6 +35,7 @@ public class MainActivity
     String selectedActivity = "N/A";
 
     private String filename = "AM_data.txt";
+    private String feature_filename = "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv";
     private String filepath = "ActivityMonitoring";
     File myExternalFile;
     String myData = "";
@@ -63,6 +64,9 @@ public class MainActivity
         }
 
         radioActivityGroup = findViewById(R.id.radioActivity);
+        RadioButton radioButtonSitting = (RadioButton)findViewById(R.id.radioSitting);
+        radioButtonSitting.setChecked(true);
+
         btnRecord = findViewById(R.id.btnRecord);
         btnRecord.setOnClickListener(new View.OnClickListener() {
             @Override
