@@ -13,16 +13,18 @@ from enum import Enum
 # data is sampled each 100ms
 # removed the last ";" in each line; e.g. vim: ":%normal $x"
 # removed line 343420, as data was incomplete
-filename = './WISDM_ar_v1.1/WISDM_ar_v1.1_raw.csv'
+filename = './Self_recorded/raw.csv'
+#filename = './WISDM_ar_v1.1/WISDM_ar_v1.1_raw.csv'
 #filename = './WISDM_ar_v1.1/WISDM_ar_v1.1_raw_smaller.csv'
-features_filename = 'WISDM_ar_v1.1/features.csv'
+features_filename = 'Self_recorded/features.csv'
+#features_filename = 'WISDM_ar_v1.1/features.csv'
 #features_filename = 'WISDM_ar_v1.1/features_smaller.csv'
 window_len = 20
 window_overlap_facotor = 0.5
 train_ratio = 0.7
 
-#use_preprocessed_features_file = False
-use_preprocessed_features_file = True
+use_preprocessed_features_file = False
+#use_preprocessed_features_file = True
 
 # other potential features: std-deviation, correlation coeff, energy
 feature_columns = ["x_max", "x_min", "x_mean", "y_max", "y_min", "y_mean", "z_max", "z_min", "z_mean", "n_max", "n_min", "n_mean"]
