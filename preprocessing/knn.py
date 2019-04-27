@@ -16,6 +16,7 @@ from enum import Enum
 filename = './WISDM_ar_v1.1/WISDM_ar_v1.1_raw.csv'
 #filename = './WISDM_ar_v1.1/WISDM_ar_v1.1_raw_smaller.csv'
 features_filename = 'WISDM_ar_v1.1/features.csv'
+features_filename = 'WISDM_ar_v1.1/features_JogginWalkingSittingStanding_wholeset_allFeatures.csv'
 #features_filename = 'WISDM_ar_v1.1/features_smaller.csv'
 window_len = 20
 window_overlap_facotor = 0.5
@@ -26,8 +27,10 @@ use_preprocessed_features_file = True
 
 # other potential features: std-deviation, correlation coeff, energy
 feature_columns = ["x_max", "x_min", "x_mean", "y_max", "y_min", "y_mean", "z_max", "z_min", "z_mean", "n_max", "n_min", "n_mean"]
+#feature_columns = ["n_max", "n_min", "n_mean"]
 identifier_columns = ["activity", "person_id"]
 activities = ["Jogging", "Walking", "Upstairs", "Downstairs", "Sitting", "Standing"]
+#activities = ["Jogging", "Walking", "Sitting", "Standing"]
 activities = sorted(set(activities))  # unique and sorted
 activities_map = d = dict([(y, x + 1) for x, y in enumerate(activities)])
 
@@ -49,16 +52,24 @@ def calculate_features(feature_frame, window_feature_index, user, activity, acce
     feature_frame.loc[[window_feature_index], ['n_max']] = np.max(acceleration_window[:, 3])
     feature_frame.loc[[window_feature_index], ['n_min']] = np.min(acceleration_window[:, 3])
     feature_frame.loc[[window_feature_index], ['n_mean']] = np.mean(acceleration_window[:, 3])
-    #window_feature_index += 1
+    #window_feature_index += 1feature_columns = ["x_max", "x_min", "x_mean", "y_max", "y_min", "y_mean", "z_max", "z_min", "z_mean", "n_max", "n_min", "n_mean"]
 
 
 # normalize columns to have a mean of zero and standard deviation of 1
+# the normalized values are returned and the mean and std value for each feature to be able to normalize live data
+# todo export normalization coefficients
 def normalize_features(feature_frame):
     feature_frame_normal = pd.DataFrame(0, index=np.arange(len(feature_frame)),
                      columns=identifier_columns + feature_columns)
+
+    feature_mean_values = feature_frame.loc[:, feature_columns].mean()
+    feature_std_values = feature_frame.loc[:, feature_columns].std()
+
+    # identifier columns can't be normalized, just assign
     feature_frame_normal.loc[:, identifier_columns] = feature_frame.loc[:, identifier_columns]
+    # feature columns are normalized
     feature_frame_normal.loc[:, feature_columns] = (feature_frame.loc[:, feature_columns] - feature_frame.loc[:, feature_columns].mean()) / feature_frame.loc[:, feature_columns].std()
-    return feature_frame_normal
+    return feature_frame_normal, feature_mean_values, feature_std_values
 
 
 def euclidean_distance(instance1, instance2, length):
@@ -126,10 +137,13 @@ def create_feature_set():
         current_acceleration_window = np.zeros((window_len, 4), dtype=float)
 
         for i, row in enumerate(lines):
-            if i != 0 and  (i*100) % row_count  == 0:
-                print( (i*100 )/row_count )
+            if i != 0 and (i*100) % row_count == 0:
+                print((i*100)/row_count)
             if len(row) != 6:
                 print("error: input columns")
+                continue
+            if row[1] not in activities:
+                current_activity = row[1]
                 continue
             if current_user != row[0] or current_activity != row[1]:
                 #todo delete current set start new
@@ -137,9 +151,14 @@ def create_feature_set():
                 current_activity = row[1]
                 in_window_offset = 0
                 #samples_in_current_window_count = 0
+
+            # assign the x,y,z acceleration values
             current_acceleration_window[in_window_offset][:3] = row[3:6]
+            # squared absolute value: direction independed n as  sum of squares(of x,y,z)
             current_acceleration_window[in_window_offset][3] = np.sum(np.square(current_acceleration_window[in_window_offset, 0:3]))
             in_window_offset += 1
+
+            # once window_len values are accumulated, calculate features, todo has to be modified to calculate features from overlapping window-frame
             if in_window_offset >= window_len:
                 calculate_features(window_feature_frame, window_feature_index , current_user, current_activity, current_acceleration_window)
                 window_feature_index += 1
@@ -153,7 +172,7 @@ def create_feature_set():
 
 def train_and_classify_manually():
     window_feature_frame = pd.read_csv(features_filename)
-    norm = normalize_features(window_feature_frame)
+    norm, norm_mean, norm_std = normalize_features(window_feature_frame)
     print("then")
 
     train_test_split_index = math.floor(len(norm)*train_ratio)
@@ -177,13 +196,13 @@ def train_and_classify():
     window_feature_frame = pd.read_csv(features_filename)
     norm = normalize_features(window_feature_frame)
     print("then")
-    # todo store normalization mean / std
+    # todo store normalization mean / std, that we can also normalize the live data
     train_test_split_index = math.floor(len(norm)*train_ratio)
     train = norm[:train_test_split_index]
     test = norm[train_test_split_index:]
 
     # evaluate based on the  five closest neighbors.
-    knn = KNeighborsClassifier(n_neighbors=5)
+    knn = KNeighborsClassifier(n_neighbors=17)
 
     # Fit the model on the training data.
     y_col = ["activity"]
@@ -220,6 +239,7 @@ def train_and_classify():
     print("{} error out of {} -> error_rate:{}".format(errors, len(test), errors/len(actual)))
 
 
+print(activities_map)
 if not use_preprocessed_features_file:
     create_feature_set()
 

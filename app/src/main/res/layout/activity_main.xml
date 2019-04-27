@@ -14,24 +14,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/label_accelerometer"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.732"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnRecord" />
+
+    <TextView
+        android:id="@+id/textLabelRecord"
+        android:layout_width="258dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:text="Record Activities"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <RadioGroup
         android:id="@+id/radioActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -94,23 +103,64 @@
         android:id="@+id/btnStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="108dp"
         android:text="@string/btn_stop"
+        app:layout_constraintBottom_toBottomOf="@+id/btnRecord"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnRecord" />
+        app:layout_constraintTop_toTopOf="@+id/btnRecord"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/textRecordStatus"
-        android:layout_width="175dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="64dp"
+        android:layout_width="111dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="128dp"
         android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:text="Record status..."
         app:layout_constraintBottom_toBottomOf="@+id/btnRecord"
         app:layout_constraintStart_toEndOf="@+id/btnRecord"
-        app:layout_constraintTop_toTopOf="@+id/btnRecord" />
+        app:layout_constraintTop_toTopOf="@+id/btnRecord"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/textLog"
+        android:layout_width="253dp"
+        android:layout_height="133dp"
+        android:layout_marginTop="188dp"
+        android:text="TextView"
+        app:layout_constraintLeft_toLeftOf="@+id/label_acceleromter"
+        app:layout_constraintTop_toBottomOf="@+id/label_acceleromter" />
+
+    <TextView
+        android:id="@+id/textPrediction"
+        android:layout_width="200dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="124dp"
+        android:text="this is going to be the pred. action"
+        app:layout_constraintStart_toStartOf="@+id/textLabelPrediction"
+        app:layout_constraintTop_toTopOf="@+id/btnPredict" />
+
+    <ToggleButton
+        android:id="@+id/btnPredict"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="96dp"
+        android:text="ToggleButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnStop" />
+
+    <TextView
+        android:id="@+id/textLabelPrediction"
+        android:layout_width="312dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="64dp"
+        android:text="Prediction"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/btnRecord"
+        app:layout_constraintTop_toBottomOf="@+id/btnStop" />
+
 
 </android.support.constraint.ConstraintLayout>
