@@ -52,6 +52,7 @@ public class MainActivity
     private int event_update_delay; //milliseconds
     private int event_update_delay_default; //milliseconds
     private boolean prediction_enabled = false;
+    private String activityLabels[];
 
     private Knn knn;
 
@@ -82,7 +83,8 @@ public class MainActivity
         //public String feature_filename = "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv";
         SharedPreferences.Editor editor = preferences.edit();
         //see https://stackoverflow.com/questions/3570690/whats-the-best-way-to-do-application-settings-in-android
-        editor.putString("feature_filename",  "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv" );
+        //editor.putString("feature_filename",  "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv" );
+        editor.putString("feature_filename",  "features.csv" );
         editor.putInt("knn_metric",  2 );  // the algorithm used to find the nearest neighbors
         editor.putInt("window_length", 20);  //defines the number of acceleration values merged into one window
         editor.putInt("knn_neighbot_count", 5); //defines how many neighbors are considered
@@ -178,7 +180,7 @@ public class MainActivity
                     int windowLen = 20;     // todo ... same
                     TestRecord testEntry = new TestRecord(accelerationRingBuffer, windowLen);
                     int activity_id = knn.execute(k, testEntry);
-                    mPredictionTextView.setText(String.format("pred: %d", activity_id));
+                    mPredictionTextView.setText(String.format("pred: %d == %s", activity_id, activityLabels[activity_id]));
                 }
                 event_update_handler.postDelayed(this, event_update_delay);
                 //event_update_handler.postDelayed(this, 1000);
@@ -187,6 +189,10 @@ public class MainActivity
 
         //allocate acceleration Ring buffer
         accelerationRingBuffer = new double[20][4]; //TODO use windowlength
+
+        //TODO not hardcode: currently id begins with zero and is assigned to alphabetically ordered activity names in ascending order
+        String[] label = {"-", "Jogging", "Sitting", "Standing", "Walking"};
+        activityLabels = label;
 
         // instantiate Knn Singelton, and store reference for simpler access
         knn = Knn.getInstance();
