@@ -85,10 +85,11 @@ public class Knn {
         return instance;
     }
 
-    //public void execute(String trainingFile, String testFile, int K, int metricType){
+    //execute knn for given k and testEntry(the given testEntry is not normalized yet)
+    // takes 30 to 60 ms for 43071 entry feature-set with 12 features each (wisdom)
     public int execute(int K, TestRecord testEntry){
         //get the current time
-        final long startTime = System.currentTimeMillis();
+        //final long startTime = System.currentTimeMillis();
 
         // make sure the input arguments are legal
         if(K <= 0){
@@ -96,24 +97,14 @@ public class Knn {
             return 99; //todo
         }
         currentTestingEntry = testEntry;
+        normalizeCurrentTestingEntry();
 
-        //test those TestRecords one by one
-        /*
-        int numOfTestingRecord = testingSet.length;
-        for(int i = 0; i < numOfTestingRecord; i ++){
-            TrainRecord[] neighbors = findKNearestNeighbors(trainingSet, testingSet[i], K, metric);
-            int classLabel = classify(neighbors);
-            testingSet[i].predictedLabel = classLabel; //assign the predicted label to TestRecord
-        }
-        */
-        //todo calculate currentTestingEntry
         TrainRecord[] neighbors = findKNearestNeighbors(trainingSet, currentTestingEntry, K, metric);
         int classLabel = classify(neighbors);
         currentTestingEntry.predictedLabel = classLabel; //assign the predicted lable to TestRecord
 
-        //print the total execution time TODO log once to know how low we can set the event timer
-        final long endTime = System.currentTimeMillis();
-        //System.out.println("Total excution time: "+(endTime - startTime) / (double)1000 +" seconds."); todo remove todo remove
+        //final long endTime = System.currentTimeMillis();
+        //System.out.println("Total excution time: "+(endTime - startTime) / (double)1000 +" seconds.");
         return classLabel;
     }
 
@@ -153,6 +144,13 @@ public class Knn {
             for (feature_index = 0; feature_index < featureCount; feature_index++) {
                 trainingSet[train_index].attributes[feature_index] = (trainingSet[train_index].attributes[feature_index] - feature_mean_values[feature_index]) / feature_std_values[feature_index];
             }
+        }
+    }
+
+    //normalizes the currentTesingEntry member, given the Trainset is already read in and normalized
+    void normalizeCurrentTestingEntry() {
+        for (int feature_index = 0; feature_index < featureCount; feature_index++) {
+            currentTestingEntry.attributes[feature_index] = (currentTestingEntry.attributes[feature_index] - feature_mean_values[feature_index]) / feature_std_values[feature_index];
         }
     }
 

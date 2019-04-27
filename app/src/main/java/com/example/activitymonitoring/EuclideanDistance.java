@@ -16,9 +16,6 @@ public class EuclideanDistance implements Metric {
             sum2 += Math.pow(s.attributes[i] - e.attributes[i], 2);
         }
 
-
-        //todo normalize
-
         return Math.sqrt(sum2);
     }
 

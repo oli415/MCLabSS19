@@ -100,17 +100,11 @@ public class FileManager {
         int numOfAttributes = 12; //TODO not static
         //Scanner scanner = new Scanner(file).useLocale(Locale.US);
         try {
-            input = assetManager.open(fileName);       //todo close at the end
+            input = assetManager.open(fileName);
             BufferedReader br = new BufferedReader(new InputStreamReader(input));
 
             //read title line
             String TitleLine = br.readLine();
-            //int NumOfSamples = scanner.nextInt();
-            //int NumOfAttributes = scanner.nextInt();
-            //int LabelOrNot = scanner.nextInt();
-            //scanner.nextLine();
-
-            //assert LabelOrNot == 1 : "No classLabel";// ensure that C is present in this file
 
             //transform data from file into TrainRecord objects
             records = new TrainRecord[numOfSamples];
@@ -130,32 +124,19 @@ public class FileManager {
                     }
                 }
 
-/*
-                //Read a whole line for a TrainRecord
-                int rowIndex = scanner.nextInt();
-                classLabel = (int) scanner.nextFloat(); // the activity
-                int personid = scanner.nextInt();
-
-                for (int i = 0; i < numOfAttributes; i++) {
-                    attributes[i] = scanner.nextDouble();
-                }
-*/
-                //Read classLabel
-                //classLabel = (int) scanner.nextDouble();
-                //assert classLabel != -1 : "Reading class label is wrong!";
-
                 records[index] = new TrainRecord(attributes, classLabel);
                 index++;
             }
+            input.close();
         } catch (Exception e){
             e.printStackTrace();
             return new TrainRecord[0];
         }
 
         //mainActivity.setLogText(String.format("records: %f, %f", records[0].attributes[0], records[0].attributes[11]));
-
         return records;
     }
+
 
     // TODO not supported and not used, as we feed live data
     public static TestRecord[] readTestFile(String fileName) throws IOException{
@@ -192,6 +173,7 @@ public class FileManager {
 
         return records;
     }
+
 
     //TODO not supported yet
     public static String outputFile(TestRecord[] testRecords, String trainFilePath) throws IOException{

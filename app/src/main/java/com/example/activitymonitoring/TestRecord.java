@@ -12,9 +12,8 @@ public class TestRecord extends Record{
 
 
     // Calculates the features from accelerationRingBuffer and normalizes them
-    // todo we need to export the normalization coefficients in the python training script
     TestRecord(double[][] accelertions, int windowLen) {
-        super(new double[2], 0);  //useless, but has to be first to comply java standard
+        super(new double[2], 0);  //useless, but has to be first statement to comply java standard
 
         //currently the features are ["x_max", "x_min", "x_mean", "y_max", "y_min", "y_mean", "z_max", "z_min", "z_mean", "n_max", "n_min", "n_mean"]
         double[] attributes;
@@ -57,9 +56,8 @@ public class TestRecord extends Record{
 
         attributes = new double[] {x_max, x_min, x_mean, y_max, y_min, y_mean, z_max, z_min, z_mean, n_max, n_min, n_mean};
 
-       //todo normalize attributes
+       // normalization of the attributes is done at execution of knn
 
         super.attributes = attributes;
     }
-    //public void CalculateFromAccelerationArray(int K){
 }

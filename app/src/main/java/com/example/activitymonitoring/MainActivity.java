@@ -52,7 +52,6 @@ public class MainActivity
     private int event_update_delay; //milliseconds
     private int event_update_delay_default; //milliseconds
     private boolean prediction_enabled = false;
-    private int tempCounter = 0; //todo remove
 
     private Knn knn;
 
@@ -175,10 +174,10 @@ public class MainActivity
                 //do something
                 //setLogText(String.format("event: i=%d, pred: %b", tempCounter++, prediction_enabled));
                 if(prediction_enabled) {
-                    int k = 5;
-                    int windowLen = 20;
+                    int k = 5;              //TODO use value from config/preferences
+                    int windowLen = 20;     // todo ... same
                     TestRecord testEntry = new TestRecord(accelerationRingBuffer, windowLen);
-                    int activity_id = knn.execute(k, testEntry); //TODO use value from config/preferences
+                    int activity_id = knn.execute(k, testEntry);
                     mPredictionTextView.setText(String.format("pred: %d", activity_id));
                 }
                 event_update_handler.postDelayed(this, event_update_delay);
