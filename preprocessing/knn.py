@@ -16,8 +16,8 @@ from enum import Enum
 filename = './Self_recorded/raw.csv'
 #filename = './WISDM_ar_v1.1/WISDM_ar_v1.1_raw.csv'
 #filename = './WISDM_ar_v1.1/WISDM_ar_v1.1_raw_smaller.csv'
-#features_filename = 'Self_recorded/features.csv'
-features_filename = 'WISDM_ar_v1.1/features_JogginWalkingSittingStanding_wholeset_allFeatures.csv'
+features_filename = 'Self_recorded/features.csv'
+#features_filename = 'WISDM_ar_v1.1/features_JogginWalkingSittingStanding_wholeset_allFeatures.csv'
 #features_filename = 'WISDM_ar_v1.1/features_smaller.csv'
 window_len = 20
 window_overlap_facotor = 0.5
@@ -30,8 +30,8 @@ use_preprocessed_features_file = False
 feature_columns = ["x_max", "x_min", "x_mean", "y_max", "y_min", "y_mean", "z_max", "z_min", "z_mean", "n_max", "n_min", "n_mean"]
 #feature_columns = ["n_max", "n_min", "n_mean"]
 identifier_columns = ["activity", "person_id"]
-activities = ["Jogging", "Walking", "Upstairs", "Downstairs", "Sitting", "Standing"]
-#activities = ["Jogging", "Walking", "Sitting", "Standing"]
+#activities = ["Jogging", "Walking", "Upstairs", "Downstairs", "Sitting", "Standing"]
+activities = ["Jogging", "Walking", "Sitting", "Standing"]
 activities = sorted(set(activities))  # unique and sorted
 activities_map = d = dict([(y, x + 1) for x, y in enumerate(activities)])
 
@@ -53,7 +53,7 @@ def calculate_features(feature_frame, window_feature_index, user, activity, acce
     feature_frame.loc[[window_feature_index], ['n_max']] = np.max(acceleration_window[:, 3])
     feature_frame.loc[[window_feature_index], ['n_min']] = np.min(acceleration_window[:, 3])
     feature_frame.loc[[window_feature_index], ['n_mean']] = np.mean(acceleration_window[:, 3])
-    #window_feature_index += 1feature_columns = ["x_max", "x_min", "x_mean", "y_max", "y_min", "y_mean", "z_max", "z_min", "z_mean", "n_max", "n_min", "n_mean"]
+    #window_feature_index += 1
 
 
 # normalize columns to have a mean of zero and standard deviation of 1
@@ -70,7 +70,8 @@ def normalize_features(feature_frame):
     feature_frame_normal.loc[:, identifier_columns] = feature_frame.loc[:, identifier_columns]
     # feature columns are normalized
     feature_frame_normal.loc[:, feature_columns] = (feature_frame.loc[:, feature_columns] - feature_frame.loc[:, feature_columns].mean()) / feature_frame.loc[:, feature_columns].std()
-    return feature_frame_normal, feature_mean_values, feature_std_values
+    return feature_frame_normal
+    #return feature_frame_normal, feature_mean_values, feature_std_values
 
 
 def euclidean_distance(instance1, instance2, length):
@@ -203,7 +204,7 @@ def train_and_classify():
     test = norm[train_test_split_index:]
 
     # evaluate based on the  five closest neighbors.
-    knn = KNeighborsClassifier(n_neighbors=17)
+    knn = KNeighborsClassifier(n_neighbors=5)
 
     # Fit the model on the training data.
     y_col = ["activity"]
