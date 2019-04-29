@@ -38,7 +38,7 @@ public class Knn {
         appContext = MainActivity.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         featureFilename = preferences.getString("feature_filename" , featureFilename);
-        int metricType = preferences.getInt("knn_metric", 2);  //Todo not sure about second parameter of getInt(), is it default,.?
+        int metricType = preferences.getInt("knn_metric", 2);
         featureCount = preferences.getInt("feature_count", 0);
 
         mainActivity = (MainActivity) MainActivity.getMainActivity();
@@ -56,8 +56,8 @@ public class Knn {
         try {
             //read trainingSet and testingSet
             trainingSet =  FileManager.readTrainFile(mainActivity, featureFilename);
-            //testingSet =  FileManager.readTestFile(testFile); //TODO not necessary, done on each exec
 
+            //TODO support additional metrics
             //determine the type of metric according to metricType
 //            if(metricType == 0)
 //                metric = new CosineSimilarity();
@@ -93,8 +93,8 @@ public class Knn {
 
         // make sure the input arguments are legal
         if(K <= 0){
-            System.out.println("K should be larger than 0!");
-            return 99; //todo
+            Log.e("KNN", "K should be larger than 0!");
+            return -1;
         }
         currentTestingEntry = testEntry;
         normalizeCurrentTestingEntry();
@@ -115,16 +115,11 @@ public class Knn {
 
         // mean value
         int train_index = 0, feature_index = 0;
-        //try {
         for (train_index = 0; train_index < trainingSet.length; train_index++) {
             for (feature_index = 0; feature_index < featureCount; feature_index++) {
                 feature_mean_values[feature_index] += trainingSet[train_index].attributes[feature_index];
             }
         }
-        //} catch (Exception e) {
-        //    Log.d("test", String.format("train_index: %d  -  feature_ind: %d", train_index, feature_index));
-        //    throw e;
-        //}
         for (feature_index = 0; feature_index < featureCount; feature_index++) {
             feature_mean_values[feature_index] /= trainingSet.length;
         }
@@ -154,8 +149,8 @@ public class Knn {
         }
     }
 
-    // Find K nearest neighbors of testRecord within trainingSet TODO not static
-    static TrainRecord[] findKNearestNeighbors(TrainRecord[] trainingSet, TestRecord testRecord,int K, Metric metric){
+    // Find K nearest neighbors of testRecord within trainingSet
+    TrainRecord[] findKNearestNeighbors(TrainRecord[] trainingSet, TestRecord testRecord,int K, Metric metric){
         int NumOfTrainingSet = trainingSet.length;
         assert K <= NumOfTrainingSet : "K is lager than the length of trainingSet!";
 
@@ -190,7 +185,7 @@ public class Knn {
     }
 
     // Get the class label by using neighbors
-    static int classify(TrainRecord[] neighbors){
+    int classify(TrainRecord[] neighbors){
         //construct a HashMap to store <classLabel, weight>
         HashMap<Integer, Double> map = new HashMap<Integer, Double>();
         int num = neighbors.length;
@@ -231,7 +226,7 @@ public class Knn {
         return returnLabel;
     }
 
-    static String extractGroupName(String filePath){
+    String extractGroupName(String filePath){
         StringBuilder groupName = new StringBuilder();
         for(int i = 15; i < filePath.length(); i ++){
             if(filePath.charAt(i) != '_')

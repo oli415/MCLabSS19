@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -59,6 +60,7 @@ public class MainActivity
     //To provide context to static methods
     private static Context context;
     private static MainActivity mainActivity;
+    private SharedPreferences sharedPreferences;
 
     public static final int DEFAULT_HEIGHT = 5;
 
@@ -78,16 +80,16 @@ public class MainActivity
         MainActivity.mainActivity = this;
 
         // define preferences; does not suite perfectly here, but so it can be easily modified
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //int storedPreference = preferences.getInt("storedInt", 0);
         //public String feature_filename = "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv";
-        SharedPreferences.Editor editor = preferences.edit();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         //see https://stackoverflow.com/questions/3570690/whats-the-best-way-to-do-application-settings-in-android
         //editor.putString("feature_filename",  "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv" );
         editor.putString("feature_filename",  "features.csv" );
         editor.putInt("knn_metric",  2 );  // the algorithm used to find the nearest neighbors
         editor.putInt("window_length", 20);  //defines the number of acceleration values merged into one window
-        editor.putInt("knn_neighbot_count", 5); //defines how many neighbors are considered
+        editor.putInt("knn_neighbor_count", 5); //defines how many neighbors are considered
         editor.putInt("feature_count", 12); //defines how many attribute features are used per entry
         editor.putInt("predict_intervall_ms", 1000); //the cycle time of the prediction calculation in ms
         // .remove()   .clear()
@@ -138,7 +140,7 @@ public class MainActivity
             public void onClick(View v) {
                 selectedActivity = "N/A";
 
-                mRecordStatusTextView.setText("not recording: ");
+                mRecordStatusTextView.setText( getResources().getString(R.string.label_record_status_disabled ));
             }
         });
 
@@ -154,7 +156,7 @@ public class MainActivity
                 } else{
                     prediction_enabled = false;
                     //event_update_delay = Integer.MAX_VALUE;
-                    mPredictionTextView.setText("-");
+                    mPredictionTextView.setText(getResources().getString(R.string.label_prediction_status_disabled));
                 }
             }
         });
@@ -169,18 +171,18 @@ public class MainActivity
 
 
         // cyclical event to update the proposed activity; can be enabled and disabled with "prediction_enabled"
-        event_update_delay_default = preferences.getInt("predict_intervall_ms", 0);
+        event_update_delay_default = sharedPreferences.getInt("predict_intervall_ms", 0);
         event_update_handler = new Handler();
         event_update_handler.postDelayed(new Runnable(){
             public void run(){
                 //do something
                 //setLogText(String.format("event: i=%d, pred: %b", tempCounter++, prediction_enabled));
                 if(prediction_enabled) {
-                    int k = 5;              //TODO use value from config/preferences
-                    int windowLen = 20;     // todo ... same
+                    int k = sharedPreferences.getInt("knn_neighbor_count", 0);
+                    int windowLen = sharedPreferences.getInt("window_length", 0);
                     TestRecord testEntry = new TestRecord(accelerationRingBuffer, windowLen);
                     int activity_id = knn.execute(k, testEntry);
-                    mPredictionTextView.setText(String.format("pred: %d == %s", activity_id, activityLabels[activity_id]));
+                    mPredictionTextView.setText(String.format("Based on the acceleleration data\n it is likely that you are:\n %s", activityLabels[activity_id]));
                 }
                 event_update_handler.postDelayed(this, event_update_delay);
                 //event_update_handler.postDelayed(this, 1000);
@@ -188,7 +190,8 @@ public class MainActivity
         }, event_update_delay);
 
         //allocate acceleration Ring buffer
-        accelerationRingBuffer = new double[20][4]; //TODO use windowlength
+        int window_length = sharedPreferences.getInt("window_length", 0);
+        accelerationRingBuffer = new double[window_length][4]; //TODO use windowlength
 
         //TODO not hardcode: currently id begins with zero and is assigned to alphabetically ordered activity names in ascending order
         String[] label = {"-", "Jogging", "Sitting", "Standing", "Walking"};
@@ -244,6 +247,7 @@ public class MainActivity
     public void onSensorChanged(SensorEvent sensorEvent) {
         int sensorType = sensorEvent.sensor.getType();
         double x, y, z;
+        int window_length = sharedPreferences.getInt("window_length", 0);
 
         switch (sensorType) {
             case Sensor.TYPE_ACCELEROMETER:
@@ -255,7 +259,7 @@ public class MainActivity
                 accelerationRingBuffer[accelerationRingBufferIndex][2] = z;
                 accelerationRingBuffer[accelerationRingBufferIndex][3] =
                         Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2);
-                accelerationRingBufferIndex = (accelerationRingBufferIndex + 1) % 20; //todo no static window length
+                accelerationRingBufferIndex = (accelerationRingBufferIndex + 1) % window_length;
                 mSensorAccelerometerTextView.setText(getResources().getString(
                         R.string.label_accelerometer, x, y, z));
 

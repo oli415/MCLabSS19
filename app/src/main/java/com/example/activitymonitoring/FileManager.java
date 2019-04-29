@@ -5,6 +5,7 @@ package com.example.activitymonitoring;
 // * OutputFile: output predicted labels into a file
 
 import android.content.res.AssetManager;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -44,7 +45,7 @@ public class FileManager {
     	        lnr.close();
     	        fr.close();
     		} else{
-    			 System.out.println("File does not exists!"); //TODO
+    			 Log.e("FileManager", "File does not exists!");
     		}
 
     	}catch(IOException e){
@@ -115,13 +116,16 @@ public class FileManager {
                 String[] row = line.split(COMMA_DELIMITER);
                 int classLabel = -1;
 
-                if(row.length > 0) {   //todo real value
+                if(row.length >= numOfAttributes + 3) {   //todo real value
                     //row[0] is index
                     classLabel = (int) Float.parseFloat(row[1]);
                     //row[2] is person id
-                    for (int feature_index = 0; feature_index < 12; feature_index++) { //todo not hardcode feature length
+                    for (int feature_index = 0; feature_index < numOfAttributes; feature_index++) {
                         attributes[feature_index] = Double.parseDouble(row[3 + feature_index]);
                     }
+                }
+                else{
+                    Log.e("FileManager", "TraininsSet row has to less elements");
                 }
 
                 records[index] = new TrainRecord(attributes, classLabel);
