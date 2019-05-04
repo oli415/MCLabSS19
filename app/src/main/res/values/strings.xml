@@ -19,4 +19,6 @@
     <string name="title_activity_monitoring">Activity Monitoring</string>
     <string name="title_indoor_localization">Indoor Localization</string>
     <string name="title_back">Back to Menu</string>
+    <string name="title_activity_wifi">WifiActivity</string>
+    <string name="title_wifi_scanner">WiFi Scanner</string>
 </resources>

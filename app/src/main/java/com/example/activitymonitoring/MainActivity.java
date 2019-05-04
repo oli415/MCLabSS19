@@ -21,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, ActivityMonitoring.class));
     }
 
+    public void openWifiScannerView(View view){
+        startActivity(new Intent(this, WifiActivity.class));
+    }
+
     public void openIndoorLocalizationView(View view){
         //Intent intent = new Intent(this, ActivityMonitoring.class);
     }
