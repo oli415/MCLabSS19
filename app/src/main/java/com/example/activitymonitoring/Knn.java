@@ -7,8 +7,6 @@ import android.util.Log;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -19,7 +17,7 @@ public class Knn {
     private static Knn instance = null;
 
     private Context appContext;
-    private MainActivity mainActivity;
+    private ActivityMonitoring activityMonitoring;
 
     private TrainRecord[] trainingSet;
     private double feature_mean_values[];
@@ -35,14 +33,14 @@ public class Knn {
 
     private Knn() {
         // get the application context that we can access content like the Shared Preferences
-        appContext = MainActivity.getAppContext();
+        appContext = ActivityMonitoring.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         featureFilename = preferences.getString("feature_filename" , featureFilename);
         int metricType = preferences.getInt("knn_metric", 2);
         featureCount = preferences.getInt("feature_count", 0);
 
-        mainActivity = (MainActivity) MainActivity.getMainActivity();
-        TextView logTextView = mainActivity.findViewById(R.id.textLog);
+        activityMonitoring = (ActivityMonitoring) ActivityMonitoring.getActivityMonitoring();
+        TextView logTextView = activityMonitoring.findViewById(R.id.textLog);
         logTextView.setText("loaded feature filename: %s".format( featureFilename));
 
 
@@ -55,7 +53,7 @@ public class Knn {
 
         try {
             //read trainingSet and testingSet
-            trainingSet =  FileManager.readTrainFile(mainActivity, featureFilename);
+            trainingSet =  FileManager.readTrainFile(activityMonitoring, featureFilename);
 
             //TODO support additional metrics
             //determine the type of metric according to metricType

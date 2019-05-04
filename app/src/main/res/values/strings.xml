@@ -1,19 +1,22 @@
 <resources>
-<string name="app_name">ActivityMonitoring</string>
-<string name="label_accelerometer">Accelerometer: x=%1$.2f, y=%2$.2f, z=%3$.2f</string>
-<string name="label_prediction">Prediction</string>
-<string name="label_record">Record Activities</string>
-<string name="label_prediction_status_disabled">The prediction is currently\n not running</string>
-<string name="label_record_status_disabled">Recording stopped</string>
-<string name="label_log_default">Logging area</string>
-<string name="error_no_sensor">No sensor</string>
-<string name="radio_sitting">Sitting</string>
-<string name="radio_standing">Standing</string>
-<string name="radio_walking">Walking</string>
-<string name="radio_upstairs">Upstairs</string>
-<string name="radio_downstairs">Downstairs</string>
-<string name="radio_jogging">Jogging</string>
-<string name="btn_record">Record</string>
-<string name="btn_stop">Stop</string>
-<string name="btn_record_default_text">ToggleButton</string>
+    <string name="app_name">Mobile Computing Laboratory App</string>
+    <string name="label_accelerometer">Accelerometer: x=%1$.2f, y=%2$.2f, z=%3$.2f</string>
+    <string name="label_prediction">Prediction</string>
+    <string name="label_record">Record Activities</string>
+    <string name="label_prediction_status_disabled">The prediction is currently\n not running</string>
+    <string name="label_record_status_disabled">Recording stopped</string>
+    <string name="label_log_default">Logging area</string>
+    <string name="error_no_sensor">No sensor</string>
+    <string name="radio_sitting">Sitting</string>
+    <string name="radio_standing">Standing</string>
+    <string name="radio_walking">Walking</string>
+    <string name="radio_upstairs">Upstairs</string>
+    <string name="radio_downstairs">Downstairs</string>
+    <string name="radio_jogging">Jogging</string>
+    <string name="btn_record">Record</string>
+    <string name="btn_stop">Stop</string>
+    <string name="btn_record_default_text">ToggleButton</string>
+    <string name="title_activity_monitoring">Activity Monitoring</string>
+    <string name="title_indoor_localization">Indoor Localization</string>
+    <string name="title_back">Back to Menu</string>
 </resources>

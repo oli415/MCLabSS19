@@ -76,15 +76,15 @@ public class FileManager {
 
     //read training files
     //todo improve: can't handle empty line at the end
-    public static TrainRecord[] readTrainFile(MainActivity mainActivity, String fileName) throws IOException{
-        AssetManager assetManager =  mainActivity.getAssets();
+    public static TrainRecord[] readTrainFile(ActivityMonitoring activityMonitoring, String fileName) throws IOException{
+        AssetManager assetManager =  activityMonitoring.getAssets();
         int numOfSamples;
         TrainRecord[] records;
 
         try {
             String[] files = assetManager.list("");
             if (!Arrays.asList(files).contains(fileName)) {
-                mainActivity.setLogText("Error: feature file does not exist");
+                activityMonitoring.setLogText("Error: feature file does not exist");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -93,7 +93,7 @@ public class FileManager {
         InputStream input = assetManager.open(fileName);
         numOfSamples = readStreamNumberOfLines(input) - 1; //1 line header
         input.close();
-        //mainActivity.setLogText(String.format("num lines %d", numOfSamples));
+        //activityMonitoring.setLogText(String.format("num lines %d", numOfSamples));
 
 
         //File file = new File(fileName);
@@ -137,7 +137,7 @@ public class FileManager {
             return new TrainRecord[0];
         }
 
-        //mainActivity.setLogText(String.format("records: %f, %f", records[0].attributes[0], records[0].attributes[11]));
+        //activityMonitoring.setLogText(String.format("records: %f, %f", records[0].attributes[0], records[0].attributes[11]));
         return records;
     }
 
