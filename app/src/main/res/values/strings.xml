@@ -6,6 +6,7 @@
     <string name="label_prediction_status_disabled">The prediction is currently\n not running</string>
     <string name="label_record_status_disabled">Recording stopped</string>
     <string name="label_log_default">Logging area</string>
+    <string name="label_direction_default">Direction:</string>
     <string name="error_no_sensor">No sensor</string>
     <string name="radio_sitting">Sitting</string>
     <string name="radio_standing">Standing</string>

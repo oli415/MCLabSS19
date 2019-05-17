@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openIndoorLocalizationView(View view){
-        //Intent intent = new Intent(this, ActivityMonitoring.class);
+        startActivity(new Intent(this, IndoorLocalization.class));
     }
 
 }
