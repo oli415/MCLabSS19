@@ -10,4 +10,20 @@ public class Room {
         this.topRightCorner = new Position(topRightCorner);
         this.id = id;
     }
+
+    public Position getBottomLeftCorner() {
+        return bottomLeftCorner;
+    }
+
+    public Position getTopRightCorner() {
+        return topRightCorner;
+    }
+
+    /*
+    public RectF getRect() {
+        //left, top, right, bottom
+        RectF r = new RectF((float)bottomLeftCorner.getX(), (float)topRightCorner.getY(), (float)topRightCorner.getX(), (float)bottomLeftCorner.getY());
+        return r;
+    }
+    */
 }

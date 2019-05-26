@@ -7,13 +7,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Handler;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -37,7 +38,11 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
 
     private TextView mDirectionTextView;
     private TextView mPredictionTextView;
-
+    //---
+    private Button btnDrawRooms;
+    private Button btnClearImage;
+    //---
+    private ImageView imageViewFloorplan;
 
     private static Context appContext;
 
@@ -45,6 +50,9 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     //private boolean motion_prediction_enabled = false;
     private int prediction_event_update_delay; //milliseconds
     private Handler prediction_event_update_handler;
+
+    Floor floor;
+    FloorMap floorMap;
 
     public void openMainView(View view){
         startActivity(new Intent(this, MainActivity.class));
@@ -92,6 +100,28 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                 prediction_event_update_handler.postDelayed(this, prediction_event_update_delay);
             }
         }, prediction_event_update_delay);
+
+
+        imageViewFloorplan = findViewById(R.id.imageViewFloorplan);
+        floor = new Floor();
+        floorMap = new FloorMap(imageViewFloorplan);
+        //floorMap.clearImage(imageViewFloorplan);
+
+
+        btnDrawRooms = findViewById(R.id.btnDrawRooms);
+        btnDrawRooms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                floorMap.drawRooms(floor.rooms);
+            }
+        });
+        btnClearImage= findViewById(R.id.btnClearImage);
+        btnClearImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                floorMap.clearImage();
+            }
+        });
 
 
 

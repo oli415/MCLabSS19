@@ -9,7 +9,7 @@
     tools:showIn="@layout/activity_indoor_localization">
 
     <Button
-        android:id="@+id/button6"
+        android:id="@+id/btnReturnFromLocalization"
         android:layout_width="120dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
@@ -27,7 +27,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewFloorplan"
         android:layout_width="123dp"
         android:layout_height="429dp"
         android:adjustViewBounds="false"
@@ -70,6 +70,25 @@
         app:layout_constraintTop_toTopOf="@+id/textDirection"
         app:layout_constraintVertical_bias="1.0" />
 
+    <Button
+        android:id="@+id/btnDrawRooms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="452dp"
+        android:text="drawRooms"
+        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
+        app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
+
+    <Button
+        android:id="@+id/btnClearImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="396dp"
+        android:text="clarImage"
+        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
+        app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
 
 
 </android.support.constraint.ConstraintLayout>

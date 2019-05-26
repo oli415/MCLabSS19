@@ -8,8 +8,6 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -52,6 +50,7 @@ public class WifiActivity extends AppCompatActivity {
         Log.i("Wifi", "Vor startScan!!!");
         // begin scan
         startScan();
+        Log.i("Wifi", "after startScan!!!");
 
         Thread thread = new Thread() {
             @Override
@@ -82,6 +81,7 @@ public class WifiActivity extends AppCompatActivity {
                     startScan();
                 }
             }, 1000);
+            //Log.i("Wifi", String.format("in scan %d!!!", scansCurrent));
             scansCurrent++;
         }
     }
@@ -97,9 +97,11 @@ public class WifiActivity extends AppCompatActivity {
         // An access point scan has completed and results are sent here
         public void onReceive(Context c, Intent intent) {
             //  Call getScanResults() to obtain the results
+            Log.i("Wifi", "onReceive start");
             List<ScanResult> results = wifi.getScanResults();
             scansReceivedCounter++;
 
+            Log.i("Wifi", String.format("Scan # %d received:  %d", scansReceivedCounter, results.size()));
             try {
                 StringBuilder builder = new StringBuilder();
                 builder.append("WiFi Scan Results:\n");
@@ -107,14 +109,16 @@ public class WifiActivity extends AppCompatActivity {
                     // SSID contains name of AP and level contains RSSI
                     //if (results.get(n).SSID.equals("Phrittenbude")) {
                         builder.append(String.format("SSID = " + results.get(n).SSID + "; RSSI =  " + results.get(n).level + "\n"));
-                        //Log.i("Wifi", "SSID = " + results.get(n).SSID + "; RSSI =  " + results.get(n).level);
+                        Log.i("Wifi", "SSID = " + results.get(n).SSID + "; RSSI =  " + results.get(n).level);
                     //}
                 }
                 String result = builder.toString();
-                Log.i("Wifi", "Scan #" + scansReceivedCounter + " received");
+                //Log.i("Wifi", "Scan #" + scansReceivedCounter + " received");
                 logText = result;
             }
-            catch (Exception e) {  }
+            catch (Exception e) {
+                Log.e("Wifi", "exception on Receive: " + results.toString());
+            }
         }
     } // End of class WifiReceiver
 
