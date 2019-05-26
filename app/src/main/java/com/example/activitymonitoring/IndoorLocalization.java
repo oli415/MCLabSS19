@@ -1,18 +1,19 @@
 package com.example.activitymonitoring;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private Sensor mMagnetometer;
+
     private float[] mLastAccelerometer = new float[3];
     private float[] mLastMagnetometer = new float[3];
     private boolean mLastAccelerometerSet = false;
@@ -32,7 +34,17 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private float[] mCurrentDegreeBuffer = new float[100];
     private int mCurrentDegreeIndex = 0;
     private float mAverageDegree = 0;
+
     private TextView mDirectionTextView;
+    private TextView mPredictionTextView;
+
+
+    private static Context appContext;
+
+    MotionEstimation motionEstimation;
+    //private boolean motion_prediction_enabled = false;
+    private int prediction_event_update_delay; //milliseconds
+    private Handler prediction_event_update_handler;
 
     public void openMainView(View view){
         startActivity(new Intent(this, MainActivity.class));
@@ -45,10 +57,44 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //read some configuration values
+        appContext = MainActivity.getAppContext();
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
+        prediction_event_update_delay = preferences.getInt("predict_intervall_ms", 0);
+
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         mDirectionTextView = findViewById(R.id.textDirection);
+        mPredictionTextView = findViewById(R.id.textPrediction);
+
+        // If msensors is null, the sensor is not available in the device.
+        String sensor_error = getResources().getString(R.string.error_no_sensor);
+        if (mAccelerometer == null) {
+            Log.e("Sensor", sensor_error);
+            while(true);
+        }
+        if (mMagnetometer == null) {
+            Log.e("Sensor", sensor_error);
+            while(true);
+        }
+
+        motionEstimation = new MotionEstimation();
+
+        // cyclical event to update the proposed activity; can be enabled and disabled with "prediction_enabled"
+        prediction_event_update_handler = new Handler();
+        prediction_event_update_handler.postDelayed(new Runnable(){
+            public void run(){
+                //if(motion_prediction_enabled) {
+                    String currentActivity = motionEstimation.estimate();
+                    mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity));
+                //}
+                prediction_event_update_handler.postDelayed(this, prediction_event_update_delay);
+            }
+        }, prediction_event_update_delay);
+
+
+
     }
 
     @Override
@@ -67,13 +113,24 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor == mAccelerometer) {
-            System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
-            mLastAccelerometerSet = true;
-        } else if (event.sensor == mMagnetometer) {
-            System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
-            mLastMagnetometerSet = true;
+        int sensorType = event.sensor.getType();
+
+        switch (sensorType) {
+            case Sensor.TYPE_ACCELEROMETER:
+                //for motion estimation:
+                motionEstimation.addAccelerationValues(event.values[0], event.values[1], event.values[2]);
+                //for orientation:
+                System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
+                mLastAccelerometerSet = true; //TODO are they reset anywhere?
+                break;
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
+                mLastMagnetometerSet = true;
+            default:
+                    //do nothing
         }
+
+        //TODO consider offloading this to orientation class?
         if (mLastAccelerometerSet && mLastMagnetometerSet) {
             SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
             SensorManager.getOrientation(mR, mOrientation);
