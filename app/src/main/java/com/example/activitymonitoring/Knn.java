@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,7 +16,7 @@ public class Knn {
     private static Knn instance = null;
 
     private Context appContext;
-    private ActivityMonitoring activityMonitoring;
+//    private ActivityMonitoring activityMonitoring;
 
     private TrainRecord[] trainingSet;
     private double feature_mean_values[];
@@ -33,15 +32,15 @@ public class Knn {
 
     private Knn() {
         // get the application context that we can access content like the Shared Preferences
-        appContext = ActivityMonitoring.getAppContext();
+        appContext = MainActivity.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         featureFilename = preferences.getString("feature_filename" , featureFilename);
         int metricType = preferences.getInt("knn_metric", 2);
         featureCount = preferences.getInt("feature_count", 0);
 
-        activityMonitoring = (ActivityMonitoring) ActivityMonitoring.getActivityMonitoring();
-        TextView logTextView = activityMonitoring.findViewById(R.id.textLog);
-        logTextView.setText("loaded feature filename: %s".format( featureFilename));
+//        activityMonitoring = (ActivityMonitoring) ActivityMonitoring.getActivityMonitoring();
+//        TextView logTextView = activityMonitoring.findViewById(R.id.textLog);
+//        logTextView.setText("loaded feature filename: %s".format( featureFilename));
 
 
         // metricType should be within [0,2];  //TODO now only type 2 is supported: return probably not approbriate
@@ -53,7 +52,7 @@ public class Knn {
 
         try {
             //read trainingSet and testingSet
-            trainingSet =  FileManager.readTrainFile(activityMonitoring, featureFilename);
+            trainingSet =  FileManager.readTrainFile(featureFilename);
 
             //TODO support additional metrics
             //determine the type of metric according to metricType
