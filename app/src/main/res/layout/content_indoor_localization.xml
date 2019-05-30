@@ -10,8 +10,8 @@
 
     <Button
         android:id="@+id/btnReturnFromLocalization"
-        android:layout_width="120dp"
-        android:layout_height="50dp"
+        android:layout_width="101dp"
+        android:layout_height="42dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -52,20 +52,20 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.10"
+        app:layout_constraintHorizontal_bias="0.032"
         app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
+    <TextView
         android:id="@+id/textPrediction"
-        android:layout_width="220dp"
-        android:layout_height="54dp"
+        android:layout_width="191dp"
+        android:layout_height="52dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:text="@string/label_prediction_status_disabled"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="@+id/btnPredict"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.527"
         app:layout_constraintStart_toEndOf="@+id/textDirection"
         app:layout_constraintTop_toTopOf="@+id/textDirection"
         app:layout_constraintVertical_bias="1.0" />
@@ -74,8 +74,7 @@
         android:id="@+id/btnDrawRooms"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="452dp"
+        android:layout_marginTop="376dp"
         android:text="drawRooms"
         app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
         app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
@@ -84,9 +83,8 @@
         android:id="@+id/btnClearImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="396dp"
-        android:text="clarImage"
+        android:layout_marginTop="316dp"
+        android:text="clear Image"
         app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
         app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
 

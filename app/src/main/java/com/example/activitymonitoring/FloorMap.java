@@ -43,17 +43,18 @@ public class FloorMap {
 
         this.imageView = imageViewFloorMap;
 
-        https://online.tugraz.at/tug_online/ris.ris?pOrgNr=2337&pQuellGeogrBTypNr=5&pZielGeogrBTypNr=5&pZielGeogrBerNr=3010001&pRaumNr=4883&pActionFlag=A&pShowEinzelraum=J
-        floorMapHeightMeter = 58.56;  //TODO more accurate only fast approximation
-        floorMapWidthMeter = 14.14;
+        //https://online.tugraz.at/tug_online/ris.ris?pOrgNr=2337&pQuellGeogrBTypNr=5&pZielGeogrBTypNr=5&pZielGeogrBerNr=3010001&pRaumNr=4883&pActionFlag=A&pShowEinzelraum=J
+        floorMapHeightMeter = 48.83;  //TODO more accurate only fast approximation
+        floorMapWidthMeter = 15.04;
         scaleX = floorMapWidthPixel / (float)floorMapWidthMeter;
         scaleY = floorMapHeightPixel / (float)floorMapHeightMeter;
 
-        Paint paint = new Paint();
+        /*Paint paint = new Paint();
         paint.setColor(Color.BLUE);
         paint.setStrokeWidth((float)5.0);
-        //liveFloorMapCanvas.drawLine((float)5.0, (float)5.0, (float)10.0, (float)100.0, paint);  //TODO only test
+        liveFloorMapCanvas.drawLine((float)5.0, (float)5.0, (float)10.0, (float)100.0, paint);  //TODO only test
         liveFloorMapCanvas.drawLine((float)5.0, (float)5.0, (float)floorMapWidthPixel, (float)floorMapHeightPixel, paint);  //TODO only test
+        */
 
         imageView.setImageBitmap(liveFloorMap);
 
