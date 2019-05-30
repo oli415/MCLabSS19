@@ -157,8 +157,11 @@ public class ActivityMonitoring
         prediction_event_update_handler.postDelayed(new Runnable(){
             public void run(){
                 if(prediction_enabled) {
-                    String currentActivity = motionEstimation.estimate();
-                    mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity));
+                    //String currentActivity = motionEstimation.estimate();
+                    //mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity));
+
+                    MotionEstimation.Activity currentActivity = motionEstimation.estimate();
+                    mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity.name()));
                 }
                 prediction_event_update_handler.postDelayed(this, prediction_event_update_delay);
             }

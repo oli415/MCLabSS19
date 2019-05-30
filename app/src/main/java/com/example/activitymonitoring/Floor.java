@@ -36,4 +36,14 @@ public class Floor {
         walls.add(new Line(new Position(8.98, 18.97), new Position(8.98, 44.56)));    //L
         walls.add(new Line(new Position(10.21, 18.97), new Position(10.21, 46.47)));    //M
     }
+
+
+
+    public float getOverallRoomArea() {
+        float area = 0;
+        for(Room room : rooms) {
+            area += room.getArea();
+        }
+        return area;
+    }
 }

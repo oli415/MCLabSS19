@@ -14,6 +14,7 @@ public class MotionEstimation {
     String myData = "";
 
     private String activityLabels[];
+    public enum Activity { UNDEFINED, JOGGING, SITTING, STANDING, WALING}
 
     private int accelerationWindowLength;
     private int knnNeighborCount;
@@ -55,11 +56,11 @@ public class MotionEstimation {
      *
      * @return the string identifying the activity
      */
-    public String estimate() {
+    public Activity estimate() {
         TestRecord testEntry = new TestRecord(accelerationRingBuffer, accelerationWindowLength);
-        int activity_id = knn.execute(knnNeighborCount, testEntry);
+        Activity activity_id = Activity.values()[knn.execute(knnNeighborCount, testEntry)];
 
-        return activityLabels[activity_id];
+        return activity_id;
     }
 
     public void addAccelerationValues(float x, float y, float z)

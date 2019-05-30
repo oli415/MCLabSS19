@@ -4,11 +4,16 @@ public class Line {
     private Position begin;
     private Position end;
 
-
     public Line(Position begin, Position end){
         this.begin = new Position(begin);
         this.end = new Position(end);
 
+    }
+
+
+    //TODO implement
+    public boolean intersects(Line lineToTest) {
+        return false;
     }
 
 }

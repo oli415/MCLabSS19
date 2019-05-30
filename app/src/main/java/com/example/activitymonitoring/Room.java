@@ -19,6 +19,15 @@ public class Room {
         return topRightCorner;
     }
 
+    public float getArea() {
+        float a = (float) ((topRightCorner.getX() -  bottomLeftCorner.getX()) * (topRightCorner.getY() - bottomLeftCorner.getY()));
+        if(a<0 ) {
+            return -a;
+        } else {
+            return a;
+        }
+    }
+
     /*
     public RectF getRect() {
         //left, top, right, bottom

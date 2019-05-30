@@ -23,8 +23,8 @@ public class FloorMap {
     int floorMapWidthPixel;
     double floorMapHeightMeter;
     double floorMapWidthMeter;
-    float scaleX;
-    float scaleY;
+    double scaleX;
+    double scaleY;
 
     Bitmap liveFloorMap;
 
@@ -61,13 +61,13 @@ public class FloorMap {
         Log.i("FloorMap", String.format("canvas width: %d", floorMapWidthPixel));
     }
 
-    private float xToMapPixel(float x_m) {
-        return  x_m * scaleX;
+    private int xToMapPixel(double x_m) {
+        return  (int)(x_m * scaleX);
         //return  (float) floorMapHeightPixel - x_m * scaleX;
     }
 
-    private float yToMapPixel(float y_m) {
-       return  (float)floorMapHeightPixel -  y_m * scaleY;
+    private int yToMapPixel(double y_m) {
+       return  floorMapHeightPixel -  (int)(y_m * scaleY);
        //return  y_m * scaleY;
     }
 
@@ -75,10 +75,10 @@ public class FloorMap {
 
     private void drawRoom(Room room, Paint paint) {
 
-        RectF r = new RectF(xToMapPixel((float)room.getBottomLeftCorner().getX()),
-                yToMapPixel((float)room.getTopRightCorner().getY()),
-                xToMapPixel((float)room.getTopRightCorner().getX()),
-                yToMapPixel((float)room.getBottomLeftCorner().getY()));
+        RectF r = new RectF(xToMapPixel(room.getBottomLeftCorner().getX()),
+                yToMapPixel(room.getTopRightCorner().getY()),
+                xToMapPixel(room.getTopRightCorner().getX()),
+                yToMapPixel(room.getBottomLeftCorner().getY()));
         //RectF r = room.getRect();
         liveFloorMapCanvas.drawRect(r, paint);
         imageView.setImageBitmap(liveFloorMap);
@@ -90,12 +90,37 @@ public class FloorMap {
         //TODO transparent: https://stackoverflow.com/questions/30169507/android-how-to-set-color-value-to-transparent
         paint.setColor(Color.parseColor("#5500FFFF"));
         paint.setStyle(Paint.Style.STROKE); //don't fill
-        paint.setStrokeWidth((float)5.0);
+        paint.setStrokeWidth(5.0f);
 
         for(Room room : rooms) {
            drawRoom(room, paint);
         }
         imageView.setImageBitmap(liveFloorMap);
+    }
+
+    private void drawParticle(Particle particle, Paint paint) {
+        liveFloorMapCanvas.drawCircle(
+                xToMapPixel(particle.getCurrentPosition().getX()),
+                yToMapPixel(particle.getCurrentPosition().getY()),
+                3,
+                paint);
+        imageView.setImageBitmap(liveFloorMap);
+    }
+
+    public void drawParticles(Particle[] particles) {
+        Paint paint = new Paint();
+        //paint.setColor(Color.GREEN);
+        // transparent: https://stackoverflow.com/questions/30169507/android-how-to-set-color-value-to-transparent
+        //              Adding 00 in the beginning will make it 100% transparent and adding FF will make it 100% solid.
+        paint.setColor(Color.parseColor("#3300DD00")); //green
+        //paint.setStyle(Paint.Style.STROKE); //don't fill
+        //paint.setStrokeWidth((float)5.0);
+
+        for(Particle particle : particles) {
+            drawParticle(particle, paint);
+        }
+        imageView.setImageBitmap(liveFloorMap);
+
     }
 
     public void clearImage() {

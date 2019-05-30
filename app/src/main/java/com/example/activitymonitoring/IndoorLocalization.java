@@ -53,6 +53,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
 
     Floor floor;
     FloorMap floorMap;
+    ParticleFilter particleFilter;
 
     public void openMainView(View view){
         startActivity(new Intent(this, MainActivity.class));
@@ -94,8 +95,23 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         prediction_event_update_handler.postDelayed(new Runnable(){
             public void run(){
                 //if(motion_prediction_enabled) {
-                    String currentActivity = motionEstimation.estimate();
-                    mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity));
+                //String currentActivity = motionEstimation.estimate();
+                MotionEstimation.Activity currentActivity = motionEstimation.estimate();
+                mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity.name()));
+
+                switch (currentActivity) {
+                    case SITTING:
+                    case STANDING:
+                        //do some stuff TODO stop
+                        break;
+                    case WALING:
+                        //do some stuff TODO start
+                        break;
+                    case JOGGING:
+                        //do some stuff TODO start
+                        break;
+                }
+
                 //}
                 prediction_event_update_handler.postDelayed(this, prediction_event_update_delay);
             }
@@ -106,6 +122,8 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         floor = new Floor();
         floorMap = new FloorMap(imageViewFloorplan);
         //floorMap.clearImage(imageViewFloorplan);
+
+        particleFilter = new ParticleFilter();
 
 
         btnDrawRooms = findViewById(R.id.btnDrawRooms);
