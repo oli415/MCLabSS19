@@ -9,6 +9,15 @@
     tools:showIn="@layout/activity_indoor_localization">
 
     <Button
+        android:id="@+id/btnClearImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="316dp"
+        android:text="clear Image"
+        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
+        app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
+
+    <Button
         android:id="@+id/btnReturnFromLocalization"
         android:layout_width="101dp"
         android:layout_height="42dp"
@@ -80,13 +89,34 @@
         app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
 
     <Button
-        android:id="@+id/btnClearImage"
+        android:id="@+id/btnStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="316dp"
-        android:text="clear Image"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="336dp"
+        android:layout_marginEnd="292dp"
+        android:background="#FF5722"
+        android:text="start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
-        app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="400dp"
+        android:layout_marginEnd="292dp"
+        android:background="#FF5722"
+        android:text="@string/btn_stop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>

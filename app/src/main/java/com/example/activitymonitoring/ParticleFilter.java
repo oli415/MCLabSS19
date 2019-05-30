@@ -25,9 +25,14 @@ public class ParticleFilter {
    float stepFrequency = 1.0f; //in s
    float stepLength = 1.0f; //m feasible stride length 0.5 to 1.2 m  /   up to 10% variation during walk for user
 
-   int numberOfParticles = 10000; //TODO check that in paper
+   int numberOfParticles = 1; //TODO check that in paper
 
    Floor floor;
+
+   public Particle[] getParticles() {
+      return particles;
+   }
+
    Particle particles[];
 
    ParticleFilter() {

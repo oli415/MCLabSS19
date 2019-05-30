@@ -14,7 +14,7 @@ public class MotionEstimation {
     String myData = "";
 
     private String activityLabels[];
-    public enum Activity { UNDEFINED, JOGGING, SITTING, STANDING, WALING}
+    public enum Activity { UNDEFINED, JOGGING, SITTING, STANDING, WALKING}
 
     private int accelerationWindowLength;
     private int knnNeighborCount;
@@ -40,8 +40,7 @@ public class MotionEstimation {
         knnNeighborCount = preferences.getInt("knn_neighbor_count", 0);
 
         //allocate acceleration Ring buffer
-        int window_length = preferences.getInt("window_length", 0);
-        accelerationRingBuffer = new double[window_length][4];
+        accelerationRingBuffer = new double[accelerationWindowLength][4];
 
         String[] label = {"-", "Jogging", "Sitting", "Standing", "Walking"};
         activityLabels = label;

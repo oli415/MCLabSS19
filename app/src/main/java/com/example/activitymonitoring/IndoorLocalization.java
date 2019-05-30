@@ -18,6 +18,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import static com.example.activitymonitoring.MotionEstimation.Activity.JOGGING;
+import static com.example.activitymonitoring.MotionEstimation.Activity.SITTING;
+import static com.example.activitymonitoring.MotionEstimation.Activity.STANDING;
+import static com.example.activitymonitoring.MotionEstimation.Activity.WALKING;
+
 //https://www.techrepublic.com/article/pro-tip-create-your-own-magnetic-compass-using-androids-internal-sensors/
 public class IndoorLocalization extends AppCompatActivity implements SensorEventListener {
 
@@ -41,6 +46,8 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     //---
     private Button btnDrawRooms;
     private Button btnClearImage;
+    private Button btnStart;
+    private Button btnStop;
     //---
     private ImageView imageViewFloorplan;
 
@@ -54,6 +61,8 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     Floor floor;
     FloorMap floorMap;
     ParticleFilter particleFilter;
+
+    boolean running = false;
 
     public void openMainView(View view){
         startActivity(new Intent(this, MainActivity.class));
@@ -88,6 +97,13 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
             while(true);
         }
 
+        imageViewFloorplan = findViewById(R.id.imageViewFloorplan);
+        floor = new Floor();
+        floorMap = new FloorMap(imageViewFloorplan);
+        //floorMap.clearImage(imageViewFloorplan);
+
+        particleFilter = new ParticleFilter();
+
         motionEstimation = new MotionEstimation();
 
         // cyclical event to update the proposed activity; can be enabled and disabled with "prediction_enabled"
@@ -99,31 +115,19 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                 MotionEstimation.Activity currentActivity = motionEstimation.estimate();
                 mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity.name()));
 
-                switch (currentActivity) {
-                    case SITTING:
-                    case STANDING:
-                        //do some stuff TODO stop
-                        break;
-                    case WALING:
-                        //do some stuff TODO start
-                        break;
-                    case JOGGING:
-                        //do some stuff TODO start
-                        break;
+                if (running){
+                    if (currentActivity == SITTING || currentActivity == WALKING ||currentActivity == JOGGING){
+                        particleFilter.moveParticles(mAverageDegree);
+                        floorMap.drawParticles(particleFilter.getParticles());
+                    }
+                    if (currentActivity == STANDING){
+
+                    }
                 }
 
-                //}
                 prediction_event_update_handler.postDelayed(this, prediction_event_update_delay);
             }
         }, prediction_event_update_delay);
-
-
-        imageViewFloorplan = findViewById(R.id.imageViewFloorplan);
-        floor = new Floor();
-        floorMap = new FloorMap(imageViewFloorplan);
-        //floorMap.clearImage(imageViewFloorplan);
-
-        particleFilter = new ParticleFilter();
 
 
         btnDrawRooms = findViewById(R.id.btnDrawRooms);
@@ -133,6 +137,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                 floorMap.drawRooms(floor.rooms);
             }
         });
+
         btnClearImage= findViewById(R.id.btnClearImage);
         btnClearImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +146,21 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
             }
         });
 
+        btnStart= findViewById(R.id.btnStart);
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                floorMap.drawParticles(particleFilter.getParticles());
+                running = true;
+            }
+        });
+        btnStop= findViewById(R.id.btnStop);
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                running = false;
+            }
+        });
 
 
     }
