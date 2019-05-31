@@ -90,8 +90,9 @@ public class ParticleFilter {
     * @return the value with noise
     */
    public double overloadWithRandomError(Random r, double x) {
-      x = x + (r.nextDouble() - 0.5) / 0.5 * x;
-      return  x;
+       float error = 0.1f;
+       x = x + (r.nextDouble() - 0.5) * error * 2 * x;
+       return  x;
    }
 
    /**
