@@ -40,6 +40,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private float[] mCurrentDegreeBuffer = new float[100];
     private int mCurrentDegreeIndex = 0;
     private float mAverageDegree = 0;
+    private float directionOffset = -90;
 
     private TextView mDirectionTextView;
     private TextView mPredictionTextView;
@@ -211,6 +212,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                     mAverageDegree = mAverageDegree + mCurrentDegreeBuffer[i];
                 }
                 mAverageDegree = mAverageDegree / 100;
+                mAverageDegree = (mAverageDegree + directionOffset) % 360;
                 mDirectionTextView.setText(String.format("Direction: %f", mAverageDegree));
             }
 
