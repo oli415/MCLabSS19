@@ -26,7 +26,6 @@ import static com.example.activitymonitoring.MotionEstimation.Activity.WALKING;
 //https://www.techrepublic.com/article/pro-tip-create-your-own-magnetic-compass-using-androids-internal-sensors/
 public class IndoorLocalization extends AppCompatActivity implements SensorEventListener {
 
-    private ImageView mPointer;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private Sensor mMagnetometer;
@@ -119,7 +118,13 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                 if (running){
                     if (currentActivity == SITTING || currentActivity == WALKING ||currentActivity == JOGGING){
                         particleFilter.moveParticles(mAverageDegree);
-                        floorMap.drawParticles(particleFilter.getParticles());
+                        particleFilter.substitudeInvalidMoves();
+                        particleFilter.normalizeWeights();
+                        particleFilter.resampleParticles();
+                        particleFilter.updateCurrentPosition();
+
+                        floorMap.clearImage();
+                        floorMap.drawParticles(particleFilter.getParticles(), particleFilter.currentPosition);
                     }
                     if (currentActivity == STANDING){
 
@@ -151,7 +156,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                floorMap.drawParticles(particleFilter.getParticles());
+                floorMap.drawParticles(particleFilter.getParticles(), particleFilter.getParticles()[0].getCurrentPosition());
                 running = true;
             }
         });

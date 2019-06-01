@@ -2,6 +2,7 @@ package com.example.activitymonitoring;
 
 import android.util.Log;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -25,7 +26,7 @@ public class ParticleFilter {
    float stepFrequency = 1.0f; //in s
    float stepLength = 1.0f; //m feasible stride length 0.5 to 1.2 m  /   up to 10% variation during walk for user
 
-   int numberOfParticles = 1; //TODO check that in paper
+   int numberOfParticles = 10000; //TODO check that in paper
 
    Floor floor;
 
@@ -35,9 +36,12 @@ public class ParticleFilter {
 
    Particle particles[];
 
+   public Position currentPosition;
+
    ParticleFilter() {
       this.floor = new Floor();
       this.particles = new Particle[numberOfParticles];
+      currentPosition = new Position();
 
       initializeParticles();
    }
@@ -116,7 +120,7 @@ public class ParticleFilter {
 
 
    /**
-    * particles, that moved through walls are eliminated and subsituted by a randomly chose particle from the last iteration
+    * particles, that moved through walls are eliminated and substituted by a randomly chosen particle from the last iteration
     */
    public void substitudeInvalidMoves() {
       Random r = new Random();
@@ -132,7 +136,7 @@ public class ParticleFilter {
          }
       }
 
-      for(int i = 0; i < numberOfParticles; i++) {
+      /*for(int i = 0; i < numberOfParticles; i++) {
          if( particles[i].getWeight() < 0.01) {
              boolean validParticle = false;
              do
@@ -144,9 +148,75 @@ public class ParticleFilter {
                 }
              } while(!validParticle);
          }
-      }
-
+      }*/
    }
 
+    public void normalizeWeights() {
+        double totalWeight = 0.0;
 
+        // compute total weight
+        for (Particle particle : particles) {
+            totalWeight += particle.getWeight();
+        }
+
+        // normalize particle weights
+        for (Particle particle : particles) {
+            particle.setWeight(particle.getWeight() / totalWeight);
+        }
+    }
+
+    public void resampleParticles() {
+        Particle[] resampledParticles = new Particle[numberOfParticles];
+
+        // compute particle cdf
+        double[] cdf = new double[numberOfParticles];
+        cdf[0] = 0.0;
+        for (int i = 1; i < numberOfParticles; i++) {
+            cdf[i] = cdf[i - 1] + particles[i].getWeight();
+        }
+
+        Random rng = new Random();
+        double p_step = 1.0 / numberOfParticles; // probability step size for resampling (new sample weight)
+        double p_resample = (rng.nextDouble() - 1) * p_step;
+        int cdf_idx = 0;
+
+        for (int i = 0; i < numberOfParticles; i++) {
+            p_resample += p_step;
+
+            while (cdf_idx < (numberOfParticles - 1) && (p_resample > cdf[cdf_idx] || particles[cdf_idx].getWeight() == 0.0)) {
+                cdf_idx++;
+            }
+
+            // if the resample particle weight is 0.0 (should only occur for the last part of the
+            // cdf) then we take a
+            // particle with non-zero weight..
+            if (particles[cdf_idx].getWeight() == 0.0)
+                resampledParticles[i] = new Particle(resampledParticles[i - 1]);
+            else
+                resampledParticles[i] = new Particle(particles[cdf_idx]);
+
+            resampledParticles[i].setWeight(p_step);
+        }
+
+        particles = resampledParticles;
+    }
+
+    public void updateCurrentPosition() {
+
+        Position position = new Position();
+
+        // take median of all particle positions
+        double[] x = new double[numberOfParticles];
+        double[] y = new double[numberOfParticles];
+        for (int i = 0; i < numberOfParticles; i++) {
+            x[i] = particles[i].getCurrentPosition().getX();
+            y[i] = particles[i].getCurrentPosition().getY();
+        }
+
+        Arrays.sort(x);
+        Arrays.sort(y);
+
+        position = new Position(x[numberOfParticles / 2], y[numberOfParticles / 2]);
+        currentPosition = position;
+    }
 }

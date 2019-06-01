@@ -108,7 +108,7 @@ public class FloorMap {
         imageView.setImageBitmap(liveFloorMap);
     }
 
-    public void drawParticles(Particle[] particles) {
+    public void drawParticles(Particle[] particles, Position currentPosition) {
         Paint paint = new Paint();
         //paint.setColor(Color.GREEN);
         // transparent: https://stackoverflow.com/questions/30169507/android-how-to-set-color-value-to-transparent
@@ -120,6 +120,16 @@ public class FloorMap {
         for(Particle particle : particles) {
             drawParticle(particle, paint);
         }
+        imageView.setImageBitmap(liveFloorMap);
+
+        // draw highest weighted particle in red (position estimate)
+        Paint mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setColor(Color.RED);
+
+        liveFloorMapCanvas.drawCircle(xToMapPixel(currentPosition.getX()), yToMapPixel(currentPosition.getY()), 5, mPaint);
+
+        imageView.setAdjustViewBounds(true);
         imageView.setImageBitmap(liveFloorMap);
 
     }
