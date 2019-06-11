@@ -36,10 +36,10 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private boolean mLastMagnetometerSet = false;
     private float[] mR = new float[9];
     private float[] mOrientation = new float[3];
-    private float[] mCurrentDegreeBuffer = new float[100];
+    private float[] mCurrentDegreeBuffer = new float[10];
     private int mCurrentDegreeIndex = 0;
     private float mAverageDegree = 0;
-    private float directionOffset = -90;
+    private float directionOffset = -30;
 
     private TextView mDirectionTextView;
     private TextView mPredictionTextView;
@@ -210,14 +210,14 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
             SensorManager.getOrientation(mR, mOrientation);
             float azimuthInRadians = mOrientation[0];
             mCurrentDegreeBuffer[mCurrentDegreeIndex] = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
-            mCurrentDegreeIndex = (mCurrentDegreeIndex + 1) % 100;
+            mCurrentDegreeIndex = (mCurrentDegreeIndex + 1) % 10;
             if (mCurrentDegreeIndex == 0){
                 mAverageDegree = 0;
-                for (int i = 0; i < 100; i++){
+                for (int i = 0; i < 10; i++){
                     mAverageDegree = mAverageDegree + mCurrentDegreeBuffer[i];
                 }
-                mAverageDegree = mAverageDegree / 100;
-                mAverageDegree = (mAverageDegree + directionOffset) % 360;
+                mAverageDegree = mAverageDegree / 10;
+                mAverageDegree = (mAverageDegree + directionOffset + 360) % 360;
                 mDirectionTextView.setText(String.format("Direction: %f", mAverageDegree));
             }
 
