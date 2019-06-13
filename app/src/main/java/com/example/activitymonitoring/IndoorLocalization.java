@@ -18,14 +18,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import static com.example.activitymonitoring.MotionEstimation.Activity.JOGGING;
-import static com.example.activitymonitoring.MotionEstimation.Activity.SITTING;
-import static com.example.activitymonitoring.MotionEstimation.Activity.STANDING;
-import static com.example.activitymonitoring.MotionEstimation.Activity.WALKING;
+import java.util.Timer;
+import java.util.TimerTask;
 
 //https://www.techrepublic.com/article/pro-tip-create-your-own-magnetic-compass-using-androids-internal-sensors/
 public class IndoorLocalization extends AppCompatActivity implements SensorEventListener {
-
+//Sensors
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private Sensor mMagnetometer;
@@ -40,7 +38,9 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private int mCurrentDegreeIndex = 0;
     private float mAverageDegree = 0;
     private float directionOffset = -90;
+    private int stepFrequency = 1000; //in ms todo
 
+//Gui-Stuff
     private TextView mDirectionTextView;
     private TextView mPredictionTextView;
     //---
@@ -48,21 +48,29 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private Button btnClearImage;
     private Button btnStart;
     private Button btnStop;
+    private Button btnReset;
     //---
     private ImageView imageViewFloorplan;
 
     private static Context appContext;
 
+
     MotionEstimation motionEstimation;
     //private boolean motion_prediction_enabled = false;
-    private int prediction_event_update_delay; //milliseconds
-    private Handler prediction_event_update_handler;
+    private int motion_prediction_event_update_delay; //milliseconds
+//    private Handler prediction_event_update_handler;
+    private Timer motionEstimationTimer;
+    private MotionEstimationThread motionEstimationThread;
+//    private MotionEstimation.Activity currentActivity;
+    private Handler stepExecutionHandler;
+    private StepExecutionThread stepExecutionThread;
 
     Floor floor;
     FloorMap floorMap;
     ParticleFilter particleFilter;
 
-    boolean running = false;
+    boolean executeLocalization = false;
+    boolean isInMotion = false;
 
     public void openMainView(View view){
         startActivity(new Intent(this, MainActivity.class));
@@ -78,7 +86,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         //read some configuration values
         appContext = MainActivity.getAppContext();
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
-        prediction_event_update_delay = preferences.getInt("predict_intervall_ms", 0);
+        motion_prediction_event_update_delay = preferences.getInt("predict_intervall_ms", 0);
 
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -106,35 +114,14 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
 
         motionEstimation = new MotionEstimation();
 
-        // cyclical event to update the proposed activity; can be enabled and disabled with "prediction_enabled"
-        prediction_event_update_handler = new Handler();
-        prediction_event_update_handler.postDelayed(new Runnable(){
-            public void run(){
-                //if(motion_prediction_enabled) {
-                //String currentActivity = motionEstimation.estimate();
-                MotionEstimation.Activity currentActivity = motionEstimation.estimate();
-                mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity.name()));
+        //the motion is estimated in fixed intervals TODO probably better to use handler as before
+        motionEstimationThread = new MotionEstimationThread();
+        motionEstimationTimer = new Timer("motionExtimationTimer");
+        motionEstimationTimer.scheduleAtFixedRate(motionEstimationThread, motion_prediction_event_update_delay, motion_prediction_event_update_delay); //TODO should we run it all the time or only on start button press
 
-                if (running){
-                    if (currentActivity == SITTING || currentActivity == WALKING ||currentActivity == JOGGING){
-                        particleFilter.moveParticles(mAverageDegree);
-                        particleFilter.substitudeInvalidMoves();
-                        particleFilter.normalizeWeights();
-                        particleFilter.resampleParticles();
-                        particleFilter.updateCurrentPosition();
-
-                        floorMap.clearImage();
-                        floorMap.drawParticles(particleFilter.getParticles(), particleFilter.currentPosition);
-                    }
-                    if (currentActivity == STANDING){
-
-                    }
-                }
-
-                prediction_event_update_handler.postDelayed(this, prediction_event_update_delay);
-            }
-        }, prediction_event_update_delay);
-
+        //steps are simulated at fixed frequency, when to device is in motion
+        stepExecutionHandler = new Handler();
+        stepExecutionThread = new StepExecutionThread();
 
         btnDrawRooms = findViewById(R.id.btnDrawRooms);
         btnDrawRooms.setOnClickListener(new View.OnClickListener() {
@@ -157,18 +144,26 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
             @Override
             public void onClick(View v) {
                 floorMap.drawParticles(particleFilter.getParticles(), particleFilter.getParticles()[0].getCurrentPosition());
-                running = true;
+                executeLocalization = true;
             }
         });
         btnStop= findViewById(R.id.btnStop);
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                running = false;
+                executeLocalization = false;
             }
         });
 
+        btnReset = findViewById(R.id.btnReset);
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                executeLocalization = false;
+                particleFilter.initializeParticles();
+            }
 
+        });
     }
 
     @Override
@@ -217,7 +212,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                     mAverageDegree = mAverageDegree + mCurrentDegreeBuffer[i];
                 }
                 mAverageDegree = mAverageDegree / 100;
-                mAverageDegree = (mAverageDegree + directionOffset) % 360;
+                //mAverageDegree = (mAverageDegree + directionOffset) % 360;
                 mDirectionTextView.setText(String.format("Direction: %f", mAverageDegree));
             }
 
@@ -228,4 +223,75 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
+    private boolean isActivityMotion(MotionEstimation.Activity activity) {
+        boolean isMotion = false;
+        switch (activity) {
+            case UNDEFINED:
+                break;
+            case JOGGING:
+                isMotion = true;
+                break;
+            case SITTING:
+                isMotion = false;
+                break;
+            case STANDING:
+                isMotion = false;
+                break;
+            case WALKING:
+                isMotion = true;
+                break;
+        }
+        return isMotion;
+    }
+
+
+    private class MotionEstimationThread extends TimerTask {
+        @Override
+        public void run() {
+            MotionEstimation.Activity currentActivity = motionEstimation.estimate();
+            //mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity.name()));
+            mPredictionTextView.setText(String.format("you are:\n %s", currentActivity.name()));
+
+            if (!executeLocalization) {
+                return;
+            }
+
+            if(isInMotion == false && isActivityMotion(currentActivity) == true) {
+                isInMotion = true;
+                stepExecutionHandler.postDelayed(stepExecutionThread, stepFrequency);
+                //stepTimer.scheduleAtFixedRate(motionEstimationThread, stepFrequency, stepFrequency); //TODO should we run it all the time or only on start button press
+
+            } else if (isInMotion == true && isActivityMotion(currentActivity) == false){
+                isInMotion = false;
+                //step timer is stopped in stepExecutionThread
+                //TODO end walking
+                }
+            }
+        }
+
+
+    private class StepExecutionThread implements Runnable {
+        @Override
+        public void run() {
+            if (isInMotion){
+                particleFilter.moveParticles(mAverageDegree);
+                particleFilter.substitudeInvalidMoves();
+                particleFilter.normalizeWeights();
+                particleFilter.resampleParticles();
+                particleFilter.updateCurrentPosition();
+
+                floorMap.clearImage();
+                floorMap.drawParticles(particleFilter.getParticles(), particleFilter.currentPosition);
+
+                stepExecutionHandler.postDelayed(this, stepFrequency);
+                //stepExecutionHandler.removeCallbacks(stepExecutionThread);
+            } else {
+                //don't postDelayed
+                //TODO display something
+            }
+        }
+    };
+
+
 }

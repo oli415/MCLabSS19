@@ -1,5 +1,6 @@
 package com.example.activitymonitoring;
 
+import android.os.Handler;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -23,12 +24,18 @@ import java.util.Random;
  *
  */
 public class ParticleFilter {
-   float stepFrequency = 1.0f; //in s
+//   float stepFrequency = 1.0f; //in s
    float stepLength = 1.0f; //m feasible stride length 0.5 to 1.2 m  /   up to 10% variation during walk for user
 
    int numberOfParticles = 10000; //TODO check that in paper
 
    Floor floor;
+
+   MotionEstimation movement;
+
+
+    private Handler step_event_handler;
+
 
    public Particle[] getParticles() {
       return particles;
@@ -85,6 +92,42 @@ public class ParticleFilter {
       }
       Log.i("particleFiler", String.format("initialized %d", initializedParticles));
    }
+
+
+//   public void startMovement(MotionEstimation motionEstimation) {
+//
+//       step_event_handler = new Handler();
+//       step_event_handler.postDelayed(new Runnable() {
+//           public void run() {
+//               //if(motion_prediction_enabled) {
+//               //String currentActivity = motionEstimation.estimate();
+//               //MotionEstimation.Activity currentActivity = motionEstimation.estimate();
+//               //mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity.name()));
+//               //TODO initialize particles ?
+//
+//               movement = motionEstimation;
+//
+//               if (motionEstimation) {
+//                   if (currentActivity == SITTING || currentActivity == WALKING || currentActivity == JOGGING) {
+//                       particleFilter.moveParticles(mAverageDegree);
+//                       particleFilter.substitudeInvalidMoves();
+//                       particleFilter.normalizeWeights();
+//                       particleFilter.resampleParticles();
+//                       particleFilter.updateCurrentPosition();
+//
+//                       floorMap.clearImage();
+//                       floorMap.drawParticles(particleFilter.getParticles(), particleFilter.currentPosition);
+//                   }
+//                   if (currentActivity == STANDING) {
+//
+//                   }
+//               }
+//
+//               prediction_event_update_handler.postDelayed(this, prediction_event_update_delay);
+//           }
+//       }, prediction_event_update_delay);
+//
+//   }
 
    //TODO move to appropriate class?
    /**
@@ -218,5 +261,8 @@ public class ParticleFilter {
 
         position = new Position(x[numberOfParticles / 2], y[numberOfParticles / 2]);
         currentPosition = position;
+
+
     }
+
 }

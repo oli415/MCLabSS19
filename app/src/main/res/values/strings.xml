@@ -16,6 +16,7 @@
     <string name="radio_jogging">Jogging</string>
     <string name="btn_record">Record</string>
     <string name="btn_stop">Stop</string>
+    <string name="btn_reset">Reset</string>
     <string name="btn_record_default_text">ToggleButton</string>
     <string name="title_activity_monitoring">Activity Monitoring</string>
     <string name="title_indoor_localization">Indoor Localization</string>
