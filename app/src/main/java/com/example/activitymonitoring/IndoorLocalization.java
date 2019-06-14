@@ -40,7 +40,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private int mCurrentDegreeIndex = 0;
     private float mAverageDegree = 0;
     private float directionOffset = -90;
-    private int stepFrequency = 1000; //in ms todo
+    private int stepPeriode = 1000; //in ms todo
 
 //Gui-Stuff
     private TextView mDirectionTextView;
@@ -56,6 +56,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private ImageView compassNeedleImageView;
     //----
     private SeekBar directionSeekBar;
+    private boolean manualDirectionEnabled;
 
     private static Context appContext;
 
@@ -93,12 +94,15 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         appContext = MainActivity.getAppContext();
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         motion_prediction_event_update_delay = preferences.getInt("predict_intervall_ms", 0);
+        manualDirectionEnabled = preferences.getBoolean("manual_direction_enabled", false);
+        stepPeriode = preferences.getInt("step_frequency", 0);
 
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         mDirectionTextView = findViewById(R.id.textDirection);
         mPredictionTextView = findViewById(R.id.textPrediction);
+
 
         // If msensors is null, the sensor is not available in the device.
         String sensor_error = getResources().getString(R.string.error_no_sensor);
@@ -125,6 +129,9 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         directionSeekBar = (SeekBar) findViewById(R.id.directionSeekBar);
         //directionSeekBar.setMin(0);
         directionSeekBar.setMax(360);
+        if(manualDirectionEnabled == false) {
+            directionSeekBar.setVisibility(View.INVISIBLE);
+        }
 
         particleFilter = new ParticleFilter();
 
@@ -231,8 +238,11 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                         Log.i("sensor", String.format("[%d]= %f", i, mCurrentDegreeBuffer[i]));
                     }
                 }
-                mAverageDegree = mAverageDegree / degreeBufferSize;
-                mAverageDegree = directionSeekBar.getProgress(); //TODO seekBar overwrites measured value
+                if(manualDirectionEnabled) {
+                    mAverageDegree = directionSeekBar.getProgress(); //TODO seekBar overwrites measured value
+                } else {
+                    mAverageDegree = mAverageDegree / degreeBufferSize;
+                }
                 //mAverageDegree = (mAverageDegree + directionOffset) % 360; //TODO add offset
                 mDirectionTextView.setText(String.format("Direction: %f", mAverageDegree));
 
@@ -282,7 +292,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
 
             if(isInMotion == false && isActivityMotion(currentActivity) == true) {
                 isInMotion = true;
-                stepExecutionHandler.postDelayed(stepExecutionThread, stepFrequency);
+                stepExecutionHandler.postDelayed(stepExecutionThread, stepPeriode);
                 //stepTimer.scheduleAtFixedRate(motionEstimationThread, stepFrequency, stepFrequency); //TODO should we run it all the time or only on start button press
 
             } else if (isInMotion == true && isActivityMotion(currentActivity) == false){
@@ -307,7 +317,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                 floorMap.clearImage();
                 floorMap.drawParticles(particleFilter.getParticles(), particleFilter.currentPosition);
 
-                stepExecutionHandler.postDelayed(this, stepFrequency);
+                stepExecutionHandler.postDelayed(this, stepPeriode);
                 //stepExecutionHandler.removeCallbacks(stepExecutionThread);
             } else {
                 //don't postDelayed

@@ -6,34 +6,18 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".IndoorLocalization"
+    tools:layout_editor_absoluteY="56dp"
     tools:showIn="@layout/activity_indoor_localization">
 
     <Button
         android:id="@+id/btnClearImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="316dp"
-        android:text="clear Image"
-        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
-        app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
-
-    <Button
-        android:id="@+id/btnReturnFromLocalization"
-        android:layout_width="101dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="#CDDC39"
-        android:onClick="openMainView"
-        android:text="@string/title_back"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="clear Image"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/btnReset" />
 
     <ImageView
         android:id="@+id/imageViewFloorplan"
@@ -53,16 +37,15 @@
         android:id="@+id/textDirection"
         android:layout_width="152dp"
         android:layout_height="67dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="36dp"
         android:text="@string/label_direction_default"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.032"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintVertical_bias="0.999"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textPrediction"
@@ -83,66 +66,57 @@
         android:id="@+id/btnDrawRooms"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="376dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="8dp"
         android:text="drawRooms"
-        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
-        app:layout_constraintTop_toTopOf="@+id/btnReturnFromLocalization" />
+        app:layout_constraintStart_toStartOf="@+id/btnClearImage"
+        app:layout_constraintTop_toBottomOf="@+id/btnClearImage" />
 
     <Button
         android:id="@+id/btnStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="292dp"
         android:background="#FF5722"
         android:text="start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.347"
-        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/imageViewFloorplan" />
 
 
     <Button
         android:id="@+id/btnStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="104dp"
-        android:layout_marginEnd="292dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="8dp"
         android:background="#FF5722"
         android:text="@string/btn_stop"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.347"
-        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/btnStart"
+        app:layout_constraintTop_toBottomOf="@+id/btnStart" />
 
     <Button
         android:id="@+id/btnReset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="160dp"
-        android:layout_marginEnd="292dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="8dp"
         android:background="#FF5722"
         android:text="@string/btn_reset"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.347"
-        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/btnStop"
+        app:layout_constraintTop_toBottomOf="@+id/btnStop" />
 
     <ImageView
         android:id="@+id/imageViewCompassNeedle"
         android:layout_width="118dp"
         android:layout_height="118dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="324dp"
-        app:layout_constraintLeft_toLeftOf="@+id/btnReturnFromLocalization"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.7"
         app:srcCompat="@drawable/compass_needle" />
 
     <SeekBar
@@ -150,11 +124,11 @@
         android:layout_width="337dp"
         android:layout_height="32dp"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="520dp"
         android:layout_marginEnd="25dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/textDirection"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>
