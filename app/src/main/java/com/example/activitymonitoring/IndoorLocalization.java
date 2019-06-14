@@ -35,10 +35,13 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private boolean mLastMagnetometerSet = false;
     private float[] mR = new float[9];
     private float[] mOrientation = new float[3];
-    private final int degreeBufferSize = 100;
-    private float[] mCurrentDegreeBuffer = new float[degreeBufferSize];
-    private int mCurrentDegreeIndex = 0;
-    private float mAverageDegree = 0;
+//    private final int degreeBufferSize = 100;
+//    private float[] mCurrentDegreeBuffer = new float[degreeBufferSize];
+//    private int mCurrentDegreeIndex = 0;
+//    private float mAverageDegree = 0;
+static int accCount=0, magCount=0; //TODO remove
+    private float degreeExponentialMovingAverage = 0;
+    private float degreeCurrent = 0;
     private float directionOffset = -90;
     private int stepPeriode = 1000; //in ms todo
 
@@ -215,17 +218,50 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                 //for orientation:
                 System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
                 mLastAccelerometerSet = true; //TODO are they reset anywhere?
+//                accCount++;
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
                 System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
                 mLastMagnetometerSet = true;
+
+                SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
+                SensorManager.getOrientation(mR, mOrientation);
+                float azimuthInRadians = mOrientation[0];
+                degreeCurrent = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
+
+                if((degreeCurrent - degreeExponentialMovingAverage) > 180.0f) {
+                    degreeExponentialMovingAverage += 360;
+                } else if(( degreeCurrent - degreeExponentialMovingAverage) < -180.0f){
+                    degreeCurrent += 360;
+                }
+                float a = 0.960789f;
+                magCount++;
+                degreeExponentialMovingAverage = a*degreeExponentialMovingAverage + (1-a)* degreeCurrent;
+                degreeExponentialMovingAverage = degreeExponentialMovingAverage % 360;
+                compassNeedleImageView.setRotation(-degreeExponentialMovingAverage);
+                if(magCount == 10)  {
+                    mDirectionTextView.setText(String.format("Direction: %f", degreeExponentialMovingAverage));
+                   magCount = 0;
+                }
             default:
                     //do nothing
         }
 
+        // sampling in GAMING_MODE: all T=20ms
+        //                                                Tau=1.0   ->  a =               =0.980198
+        //exponential moving average: a = e^(-T/ Tau)=>   Tau= 0.5  ->  a = e^(-0.02/0.5) =0.960789
+        //                                                Tau=0.2   ->  a =               =0.904837
+        //                                                Tau=0.1   ->  a =               =0.818731
+
+
         //TODO consider offloading this to orientation class?
         if (mLastAccelerometerSet && mLastMagnetometerSet) {
+            Log.i("sensor", String.format("acc: %d      magnet: %d", accCount, magCount));
+            /*
             SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
+            Log.i("sensor", String.format("acc: x:%f, y:%f, z:%f ------magneto: x:%f, y:%f, z:%f",
+                    mLastAccelerometer[0], mLastAccelerometer[1], mLastAccelerometer[2],
+                    mLastMagnetometer[0], mLastMagnetometer[1], mLastMagnetometer[2] ));
             SensorManager.getOrientation(mR, mOrientation);
             float azimuthInRadians = mOrientation[0];
             mCurrentDegreeBuffer[mCurrentDegreeIndex] = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
@@ -247,9 +283,9 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
                 mDirectionTextView.setText(String.format("Direction: %f", mAverageDegree));
 
                 compassNeedleImageView.setRotation(mAverageDegree);
-            }
 
-        }
+            }
+  */    }
     }
 
     @Override
@@ -308,7 +344,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         @Override
         public void run() {
             if (isInMotion){
-                particleFilter.moveParticles(mAverageDegree);
+                particleFilter.moveParticles(degreeExponentialMovingAverage);
                 particleFilter.substitudeInvalidMoves();
                 particleFilter.normalizeWeights();
                 particleFilter.resampleParticles();
