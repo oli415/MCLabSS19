@@ -36,6 +36,7 @@ public class WifiActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wifi);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mLogTextView = findViewById(R.id.textLog);
 

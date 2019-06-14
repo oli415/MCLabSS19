@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.Timer;
@@ -34,7 +35,8 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private boolean mLastMagnetometerSet = false;
     private float[] mR = new float[9];
     private float[] mOrientation = new float[3];
-    private float[] mCurrentDegreeBuffer = new float[100];
+    private final int degreeBufferSize = 100;
+    private float[] mCurrentDegreeBuffer = new float[degreeBufferSize];
     private int mCurrentDegreeIndex = 0;
     private float mAverageDegree = 0;
     private float directionOffset = -90;
@@ -51,6 +53,9 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
     private Button btnReset;
     //---
     private ImageView imageViewFloorplan;
+    private ImageView compassNeedleImageView;
+    //----
+    private SeekBar directionSeekBar;
 
     private static Context appContext;
 
@@ -82,6 +87,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         setContentView(R.layout.activity_indoor_localization);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //read some configuration values
         appContext = MainActivity.getAppContext();
@@ -104,11 +110,21 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
             Log.e("Sensor", sensor_error);
             while(true);
         }
+        Log.i("Sensor", String.format("accelerometerSensorDelay: %d us", mAccelerometer.getMinDelay()));
+        Log.i("Sensor", String.format("erometerSensorDelay %d us", mAccelerometer.getMinDelay()));
+        //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        //mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
 
         imageViewFloorplan = findViewById(R.id.imageViewFloorplan);
         floor = new Floor();
         floorMap = new FloorMap(imageViewFloorplan);
         //floorMap.clearImage(imageViewFloorplan);
+
+        compassNeedleImageView = findViewById(R.id.imageViewCompassNeedle);
+
+        directionSeekBar = (SeekBar) findViewById(R.id.directionSeekBar);
+        //directionSeekBar.setMin(0);
+        directionSeekBar.setMax(360);
 
         particleFilter = new ParticleFilter();
 
@@ -187,6 +203,7 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
         switch (sensorType) {
             case Sensor.TYPE_ACCELEROMETER:
                 //for motion estimation:
+                //TODO forward not all acceleration values as we do sample now at 10th speed
                 motionEstimation.addAccelerationValues(event.values[0], event.values[1], event.values[2]);
                 //for orientation:
                 System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
@@ -205,15 +222,21 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
             SensorManager.getOrientation(mR, mOrientation);
             float azimuthInRadians = mOrientation[0];
             mCurrentDegreeBuffer[mCurrentDegreeIndex] = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
-            mCurrentDegreeIndex = (mCurrentDegreeIndex + 1) % 100;
+            mCurrentDegreeIndex = (mCurrentDegreeIndex + 1) % degreeBufferSize;
             if (mCurrentDegreeIndex == 0){
                 mAverageDegree = 0;
-                for (int i = 0; i < 100; i++){
+                for (int i = 0; i < degreeBufferSize; i++){
                     mAverageDegree = mAverageDegree + mCurrentDegreeBuffer[i];
+                    if(i<4) {
+                        Log.i("sensor", String.format("[%d]= %f", i, mCurrentDegreeBuffer[i]));
+                    }
                 }
-                mAverageDegree = mAverageDegree / 100;
-                //mAverageDegree = (mAverageDegree + directionOffset) % 360;
+                mAverageDegree = mAverageDegree / degreeBufferSize;
+                mAverageDegree = directionSeekBar.getProgress(); //TODO seekBar overwrites measured value
+                //mAverageDegree = (mAverageDegree + directionOffset) % 360; //TODO add offset
                 mDirectionTextView.setText(String.format("Direction: %f", mAverageDegree));
+
+                compassNeedleImageView.setRotation(mAverageDegree);
             }
 
         }

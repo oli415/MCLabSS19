@@ -60,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, IndoorLocalization.class));
     }
 
+    public void openSettingsView(View view) {
+        startActivity(new Intent(this, Settings.class));
+    }
+
 
     public static Context getAppContext() {
         return MainActivity.context;
