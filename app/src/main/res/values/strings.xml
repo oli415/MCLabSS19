@@ -26,6 +26,14 @@
     <string name="title_activity_settings">Settings</string>
     <string name="label_settings_step_length">step length</string>
     <string name="label_settings_step_periode">step periode</string>
+    <string name="label_settings_direction_offset">direction offset</string>
     <string name="label_settings_statistical">Statistical Particles</string>
     <string name="label_settings_manual_direction">Manual Direction Input</string>
+    <string name="label_settings_compass_true_north">Compass Visualization Direction/North</string>
+    <string name="switch_manual_magnetometer_1">manual mode is enabled</string>
+    <string name="switch_manual_magnetometer_2">magnetometer mode is enabled</string>
+    <string name="switch_particles_statistical_random_1">statistical particles are enabled</string>
+    <string name="switch_particles_statistical_random_2">particle mode is random</string>
+    <string name="switch_compass_direction_true_north_1">compass points in walking direction</string>
+    <string name="switch_compass_direction_true_north_2">compass points to north</string>
 </resources>

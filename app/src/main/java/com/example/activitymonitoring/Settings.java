@@ -23,13 +23,17 @@ public class Settings extends AppCompatActivity {
 
     EditText stepLengthEditText;
     EditText stepPeriodeEditText;
+    EditText directionOffsetEditText;
     Switch enableManualDirection;
     Switch enableStatisticalParticles;
+    Switch enableCompassTrueDirection;  //else north
 
     int stepLengthmm;
     int stepPeriodems;
+    int directionOffset;
     boolean manualDirectionEnabled;
     boolean statisticalParticlesEnabled;
+    boolean compassDirectionIsTrueDirection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,20 +46,41 @@ public class Settings extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
 
         stepLengthEditText= (EditText)findViewById(R.id.editTextStepLength);
-        stepPeriodeEditText= (EditText)findViewById(R.id.editTextPeriode);
+        stepPeriodeEditText= (EditText)findViewById(R.id.editTextStepPeriode);
+        directionOffsetEditText = (EditText)findViewById(R.id.editTextDirectionOffset);
         enableManualDirection = findViewById(R.id.switchManualDirection);
         enableStatisticalParticles = findViewById(R.id.switchStatistical);
+        enableCompassTrueDirection = findViewById(R.id.switchCompassTrueNorth);
 
         stepLengthmm = sharedPreferences.getInt("step_length", 0);
         stepPeriodems = sharedPreferences.getInt("step_periode", 0);
+        directionOffset = sharedPreferences.getInt("direction_offset", 0);
         manualDirectionEnabled = sharedPreferences.getBoolean("manual_direction_enabled", false);
         statisticalParticlesEnabled = sharedPreferences.getBoolean("statistical_particles_enabled", false);
+        compassDirectionIsTrueDirection = sharedPreferences.getBoolean("compass_is_true_direction", true);
 
         stepLengthEditText.setText(String.format("%d", stepLengthmm));
         stepPeriodeEditText.setText(String.format("%d", stepPeriodems));
+        directionOffsetEditText.setText(String.format("%d", directionOffset));
         enableManualDirection.setChecked(manualDirectionEnabled);
         enableStatisticalParticles.setChecked(statisticalParticlesEnabled);
+        enableCompassTrueDirection.setChecked(compassDirectionIsTrueDirection);
 
+        if(manualDirectionEnabled) {
+            enableManualDirection.setText(R.string.switch_manual_magnetometer_1);
+        } else {
+            enableManualDirection.setText(R.string.switch_manual_magnetometer_2);
+        }
+        if(statisticalParticlesEnabled) {
+            enableStatisticalParticles.setText(R.string.switch_particles_statistical_random_1);
+        } else {
+            enableStatisticalParticles.setText(R.string.switch_particles_statistical_random_2);
+        }
+        if(compassDirectionIsTrueDirection) {
+            enableCompassTrueDirection.setText(R.string.switch_compass_direction_true_north_1);
+        } else {
+            enableCompassTrueDirection.setText(R.string.switch_compass_direction_true_north_2);
+        }
 
         stepLengthEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -96,7 +121,7 @@ public class Settings extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 try {
-                    stepPeriodems= Integer.parseInt(stepPeriodeEditText.getText().toString());
+                    stepPeriodems = Integer.parseInt(stepPeriodeEditText.getText().toString());
                 }catch (Exception e) {
                     Log.i("settings", String.format("parsed invalid stepPeriode %d\n", stepPeriodems));
                 }
@@ -104,7 +129,33 @@ public class Settings extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("step_periode", stepPeriodems);
                 editor.commit();
-                Log.i("settings", String.format("step-periode changed %d\n", stepPeriodems ));
+                Log.i("settings", String.format("step-periode changed %d\n", stepPeriodems));
+            }
+        });
+
+        directionOffsetEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                try {
+                    directionOffset = Integer.parseInt(directionOffsetEditText.getText().toString());
+                }catch (Exception e) {
+                    Log.i("settings", String.format("parsed invalid direction offset %d\n", directionOffset));
+                }
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("direction_offset", directionOffset);
+                editor.commit();
+                Log.i("settings", String.format("direction offset changed %d\n", directionOffset));
             }
         });
 
@@ -116,9 +167,9 @@ public class Settings extends AppCompatActivity {
                 editor.commit();
 
                 if(manualDirectionEnabled) {
-                    enableManualDirection.setText("manual mode is enabled");
+                    enableManualDirection.setText(R.string.switch_manual_magnetometer_1);
                 } else {
-                    enableManualDirection.setText("magnetometer mode is enabled");
+                    enableManualDirection.setText(R.string.switch_manual_magnetometer_2);
                 }
             }
         });
@@ -131,9 +182,25 @@ public class Settings extends AppCompatActivity {
                 editor.commit();
 
                 if(statisticalParticlesEnabled) {
-                    buttonView.setText("statistical particles are enabled");
+                    buttonView.setText(R.string.switch_particles_statistical_random_1);
                 } else {
-                    buttonView.setText("particle mode random");
+                    buttonView.setText(R.string.switch_particles_statistical_random_2);
+                }
+            }
+        });
+
+        enableCompassTrueDirection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                compassDirectionIsTrueDirection = buttonView.isChecked();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("compass_is_true_direction", compassDirectionIsTrueDirection);
+                editor.commit();
+
+                if(compassDirectionIsTrueDirection) {
+                    buttonView.setText(R.string.switch_compass_direction_true_north_1);
+                } else {
+                    buttonView.setText(R.string.switch_compass_direction_true_north_2);
                 }
             }
         });

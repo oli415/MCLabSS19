@@ -50,7 +50,7 @@
 
 
     <EditText
-        android:id="@+id/editTextPeriode"
+        android:id="@+id/editTextStepPeriode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -59,20 +59,44 @@
         app:layout_constraintStart_toStartOf="@+id/editTextStepLength"
         app:layout_constraintTop_toBottomOf="@+id/textStepPeriode" />
 
+     <TextView
+        android:id="@+id/textDirectionOffset"
+        android:layout_width="258dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="68dp"
+        android:text="@string/label_settings_direction_offset"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="start|top"
+        app:layout_constraintStart_toStartOf="@+id/textStepPeriode"
+        app:layout_constraintTop_toTopOf="@+id/editTextStepPeriode" />
+
+
+    <EditText
+        android:id="@+id/editTextDirectionOffset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="numberSigned"
+        app:layout_constraintStart_toStartOf="@+id/editTextStepPeriode"
+        app:layout_constraintTop_toBottomOf="@+id/textDirectionOffset" />
 
     <TextView
         android:id="@+id/textEnableStatistical"
         android:layout_width="258dp"
         android:layout_height="20dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="48dp"
         android:text="@string/label_settings_statistical"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="start|top"
         app:layout_constraintStart_toStartOf="@+id/textStepLength"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPeriode" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextDirectionOffset" />
 
 
     <Switch
@@ -80,7 +104,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="16dp"
         android:text="Switch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textEnableStatistical" />
@@ -91,7 +115,7 @@
         android:layout_width="258dp"
         android:layout_height="20dp"
         android:layout_marginStart="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:text="@string/label_settings_manual_direction"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -105,11 +129,33 @@
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="16dp"
         android:text="Switch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textEnableManualDirection" />
 
+    <TextView
+        android:id="@+id/textCompassTrueNorth"
+        android:layout_width="258dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/label_settings_compass_true_north"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="start|top"
+        app:layout_constraintStart_toStartOf="@+id/textEnableManualDirection"
+        app:layout_constraintTop_toBottomOf="@+id/textEnableManualDirection" />
+
+    <Switch
+        android:id="@+id/switchCompassTrueNorth"
+        android:layout_width="wrap_content"
+        android:layout_height="22dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Switch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textCompassTrueNorth" />
 
 
 </android.support.constraint.ConstraintLayout>

@@ -41,9 +41,10 @@ public class IndoorLocalization extends AppCompatActivity implements SensorEvent
 //    private float mAverageDegree = 0;
 static int accCount=0, magCount=0; //TODO remove
     private float degreeExponentialMovingAverage = 0;
+    private float degreeExponentialMovingAverageCorrected = 0;
     private float degreeCurrent = 0;
-    private float directionOffset = -90;
-    private int stepPeriode = 1000; //in ms todo
+    private float directionOffset = -90;  //taken from preferences
+    private int stepPeriode = 1000; //in ms //taken from preferences
 
 //Gui-Stuff
     private TextView mDirectionTextView;
@@ -60,6 +61,8 @@ static int accCount=0, magCount=0; //TODO remove
     //----
     private SeekBar directionSeekBar;
     private boolean manualDirectionEnabled;
+    boolean statisticalParticlesEnabled;
+    boolean compassDirectionIsTrueDirection;
 
     private static Context appContext;
 
@@ -97,8 +100,12 @@ static int accCount=0, magCount=0; //TODO remove
         appContext = MainActivity.getAppContext();
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         motion_prediction_event_update_delay = preferences.getInt("predict_intervall_ms", 0);
-        manualDirectionEnabled = preferences.getBoolean("manual_direction_enabled", false);
         stepPeriode = preferences.getInt("step_frequency", 0);
+        directionOffset = preferences.getInt("direction_offset", 0);
+
+        manualDirectionEnabled = preferences.getBoolean("manual_direction_enabled", false);
+        statisticalParticlesEnabled = preferences.getBoolean("statistical_particles_enabled", false);
+        compassDirectionIsTrueDirection = preferences.getBoolean("compass_is_true_direction", true);
 
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -130,7 +137,6 @@ static int accCount=0, magCount=0; //TODO remove
         compassNeedleImageView = findViewById(R.id.imageViewCompassNeedle);
 
         directionSeekBar = (SeekBar) findViewById(R.id.directionSeekBar);
-        //directionSeekBar.setMin(0);
         directionSeekBar.setMax(360);
         if(manualDirectionEnabled == false) {
             directionSeekBar.setVisibility(View.INVISIBLE);
@@ -238,7 +244,22 @@ static int accCount=0, magCount=0; //TODO remove
                 magCount++;
                 degreeExponentialMovingAverage = a*degreeExponentialMovingAverage + (1-a)* degreeCurrent;
                 degreeExponentialMovingAverage = degreeExponentialMovingAverage % 360;
-                compassNeedleImageView.setRotation(-degreeExponentialMovingAverage);
+
+                degreeExponentialMovingAverageCorrected = (degreeExponentialMovingAverage  + directionOffset) % 360;
+
+                //overwrite direction in manual mode
+                if(manualDirectionEnabled) {
+                    degreeExponentialMovingAverageCorrected = directionSeekBar.getProgress();
+                }
+
+                float needle_direction;
+                if(compassDirectionIsTrueDirection) {
+                     needle_direction = degreeExponentialMovingAverageCorrected;
+                } else {
+                    needle_direction = -degreeExponentialMovingAverageCorrected;  //todo for manual mode value with correction not that useful, but here it is in general not that useful
+                }
+                compassNeedleImageView.setRotation(needle_direction);
+
                 if(magCount == 10)  {
                     mDirectionTextView.setText(String.format("Direction: %f", degreeExponentialMovingAverage));
                    magCount = 0;
