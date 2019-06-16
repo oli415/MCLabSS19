@@ -90,7 +90,7 @@
         android:layout_height="20dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="48dp"
-        android:text="@string/label_settings_statistical"
+        android:text="@string/label_settings_low_variance_resampling"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_anchor="@+id/include"

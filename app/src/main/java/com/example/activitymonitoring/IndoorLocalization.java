@@ -61,7 +61,7 @@ static int accCount=0, magCount=0; //TODO remove
     //----
     private SeekBar directionSeekBar;
     private boolean manualDirectionEnabled;
-    boolean statisticalParticlesEnabled;
+    boolean lowVarianceResamplingEnabled;
     boolean compassDirectionIsTrueDirection;
 
     private static Context appContext;
@@ -104,7 +104,7 @@ static int accCount=0, magCount=0; //TODO remove
         directionOffset = preferences.getInt("direction_offset", 0);
 
         manualDirectionEnabled = preferences.getBoolean("manual_direction_enabled", false);
-        statisticalParticlesEnabled = preferences.getBoolean("statistical_particles_enabled", false);
+        lowVarianceResamplingEnabled = preferences.getBoolean("low_variance_resampling_enabled", false);
         compassDirectionIsTrueDirection = preferences.getBoolean("compass_is_true_direction", true);
 
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
@@ -366,9 +366,16 @@ static int accCount=0, magCount=0; //TODO remove
         public void run() {
             if (isInMotion){
                 particleFilter.moveParticles(degreeExponentialMovingAverage);
-                particleFilter.substitudeInvalidMoves();
+                particleFilter.removeInvalidMoves();
                 particleFilter.normalizeWeights();
-                particleFilter.resampleParticles();
+
+                //particleFilter.resampleParticles();
+                if(lowVarianceResamplingEnabled) {
+                    particleFilter.lowVarianceSampler();
+                } else {
+                    particleFilter.randomSampler();
+                }
+
                 particleFilter.updateCurrentPosition();
 
                 floorMap.clearImage();

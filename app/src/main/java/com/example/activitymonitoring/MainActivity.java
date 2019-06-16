@@ -24,13 +24,11 @@ public class MainActivity extends AppCompatActivity {
         // assign this instance, that it can be used in static method
         MainActivity.context = getApplicationContext();
 
-        // define preferences; does not suite perfectly here, but so it can be easily modified
+        // define preferences which are currently not changeable in the program;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        //int storedPreference = preferences.getInt("storedInt", 0);
         //public String feature_filename = "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv";
         SharedPreferences.Editor editor = sharedPreferences.edit();
         //see https://stackoverflow.com/questions/3570690/whats-the-best-way-to-do-application-settings-in-android
-        //editor.putString("feature_filename",  "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv" );
 
         //see https://stackoverflow.com/questions/3570690/whats-the-best-way-to-do-application-settings-in-android
         //editor.putString("feature_filename",  "features_JoggingWalkingSittingStanding_wholeset_allFeatures.csv" );
@@ -48,18 +46,34 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * opens the application to predict your current activity
+     * @param view
+     */
     public void openActivityMonitoringView(View view){
         startActivity(new Intent(this, ActivityMonitoring.class));
     }
 
+    /**
+     * opens the application to list the nearby wifi access points and their rssi
+     * @param view
+     */
     public void openWifiScannerView(View view){
         startActivity(new Intent(this, WifiActivity.class));
     }
 
+    /**
+     * opens the particle filter indoor localization
+     * @param view
+     */
     public void openIndoorLocalizationView(View view){
         startActivity(new Intent(this, IndoorLocalization.class));
     }
 
+    /**
+     * opens settings view where several parameters for the indoor localization can be adapted
+     * @param view
+     */
     public void openSettingsView(View view) {
         startActivity(new Intent(this, Settings.class));
     }

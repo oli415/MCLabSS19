@@ -2,7 +2,6 @@ package com.example.activitymonitoring;
 
 
 //This class implements Metric interface and is used to calculate EuclideanDistance
-//public class EuclideanDistance implements Metric {
 public class EuclideanDistance implements Metric {
 
     @Override

@@ -1,5 +1,8 @@
 package com.example.activitymonitoring;
 
+/**
+ * a position in the two dimensional space
+ */
 public class Position {
     private double x;
     private double y;

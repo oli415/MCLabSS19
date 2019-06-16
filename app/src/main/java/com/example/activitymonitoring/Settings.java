@@ -25,14 +25,14 @@ public class Settings extends AppCompatActivity {
     EditText stepPeriodeEditText;
     EditText directionOffsetEditText;
     Switch enableManualDirection;
-    Switch enableStatisticalParticles;
+    Switch enableLowVarianceResampling;
     Switch enableCompassTrueDirection;  //else north
 
     int stepLengthmm;
     int stepPeriodems;
     int directionOffset;
     boolean manualDirectionEnabled;
-    boolean statisticalParticlesEnabled;
+    boolean lowVarianceResamplingEnabled;
     boolean compassDirectionIsTrueDirection;
 
     @Override
@@ -49,21 +49,21 @@ public class Settings extends AppCompatActivity {
         stepPeriodeEditText= (EditText)findViewById(R.id.editTextStepPeriode);
         directionOffsetEditText = (EditText)findViewById(R.id.editTextDirectionOffset);
         enableManualDirection = findViewById(R.id.switchManualDirection);
-        enableStatisticalParticles = findViewById(R.id.switchStatistical);
+        enableLowVarianceResampling = findViewById(R.id.switchStatistical);
         enableCompassTrueDirection = findViewById(R.id.switchCompassTrueNorth);
 
         stepLengthmm = sharedPreferences.getInt("step_length", 0);
         stepPeriodems = sharedPreferences.getInt("step_periode", 0);
         directionOffset = sharedPreferences.getInt("direction_offset", 0);
         manualDirectionEnabled = sharedPreferences.getBoolean("manual_direction_enabled", false);
-        statisticalParticlesEnabled = sharedPreferences.getBoolean("statistical_particles_enabled", false);
+        lowVarianceResamplingEnabled = sharedPreferences.getBoolean("low_variance_resampling_enabled", true);
         compassDirectionIsTrueDirection = sharedPreferences.getBoolean("compass_is_true_direction", true);
 
         stepLengthEditText.setText(String.format("%d", stepLengthmm));
         stepPeriodeEditText.setText(String.format("%d", stepPeriodems));
         directionOffsetEditText.setText(String.format("%d", directionOffset));
         enableManualDirection.setChecked(manualDirectionEnabled);
-        enableStatisticalParticles.setChecked(statisticalParticlesEnabled);
+        enableLowVarianceResampling.setChecked(lowVarianceResamplingEnabled);
         enableCompassTrueDirection.setChecked(compassDirectionIsTrueDirection);
 
         if(manualDirectionEnabled) {
@@ -71,10 +71,10 @@ public class Settings extends AppCompatActivity {
         } else {
             enableManualDirection.setText(R.string.switch_manual_magnetometer_2);
         }
-        if(statisticalParticlesEnabled) {
-            enableStatisticalParticles.setText(R.string.switch_particles_statistical_random_1);
+        if(lowVarianceResamplingEnabled) {
+            enableLowVarianceResampling.setText(R.string.switch_particles_low_variance_resampling_1);
         } else {
-            enableStatisticalParticles.setText(R.string.switch_particles_statistical_random_2);
+            enableLowVarianceResampling.setText(R.string.switch_particles_low_variance_resampling_2);
         }
         if(compassDirectionIsTrueDirection) {
             enableCompassTrueDirection.setText(R.string.switch_compass_direction_true_north_1);
@@ -174,17 +174,17 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        enableStatisticalParticles.setOnCheckedChangeListener(   new CompoundButton.OnCheckedChangeListener() {
+        enableLowVarianceResampling.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                statisticalParticlesEnabled = buttonView.isChecked();
+                lowVarianceResamplingEnabled = buttonView.isChecked();
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("statistical_particles_enabled", statisticalParticlesEnabled);
+                editor.putBoolean("low_variance_resampling_enabled", lowVarianceResamplingEnabled);
                 editor.commit();
 
-                if(statisticalParticlesEnabled) {
-                    buttonView.setText(R.string.switch_particles_statistical_random_1);
+                if(lowVarianceResamplingEnabled) {
+                    buttonView.setText(R.string.switch_particles_low_variance_resampling_1);
                 } else {
-                    buttonView.setText(R.string.switch_particles_statistical_random_2);
+                    buttonView.setText(R.string.switch_particles_low_variance_resampling_2);
                 }
             }
         });
