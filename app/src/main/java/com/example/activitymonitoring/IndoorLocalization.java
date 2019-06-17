@@ -339,7 +339,7 @@ static int accCount=0, magCount=0; //TODO remove
                 isMotion = true;
                 break;
             case SITTING:
-                isMotion = false;
+                isMotion = true;
                 break;
             case STANDING:
                 isMotion = false;
@@ -381,13 +381,14 @@ static int accCount=0, magCount=0; //TODO remove
         @Override
         public void run() {
             if (isInMotion){
-                particleFilter.moveParticles(degreeExponentialMovingAverage);
+                particleFilter.moveParticles(degreeExponentialMovingAverageCorrected);
                 particleFilter.removeInvalidMoves();
                 particleFilter.normalizeWeights();
 
                 //particleFilter.resampleParticles();
                 if(lowVarianceResamplingEnabled) {
-                    particleFilter.lowVarianceSampler();
+                    //particleFilter.lowVarianceSampler();
+                    particleFilter.resampleParticles();
                 } else {
                     particleFilter.randomSampler();
                 }

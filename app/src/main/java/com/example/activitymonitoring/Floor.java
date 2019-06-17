@@ -35,6 +35,7 @@ public class Floor {
         walls.add(new Line(new Position(0, 18.97), new Position(8.98, 18.97)));    //K
         walls.add(new Line(new Position(8.98, 18.97), new Position(8.98, 44.56)));    //L
         walls.add(new Line(new Position(10.21, 18.97), new Position(10.21, 46.47)));    //M
+        walls.add(new Line(new Position(8.98, 40.52), new Position(10.21, 40.52)));    //N
     }
 
 
