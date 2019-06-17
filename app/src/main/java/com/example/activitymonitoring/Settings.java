@@ -247,13 +247,13 @@ public class Settings extends AppCompatActivity {
             public void onClick(View view) {
                 //sharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("step_length", 600);
+                editor.putInt("step_length", 850);
                 editor.putInt("step_period",  800);
-                editor.putInt("direction_offset", 30); //TODO
-                editor.putInt("direction_uncertainty", 40); //TODO
+                editor.putInt("direction_offset", -50); //TODO
+                editor.putInt("direction_uncertainty", 20); //TODO
                 editor.putInt("length_uncertainty", 10);
-                editor.putBoolean("manual_direction_enabled", false);
                 editor.putBoolean("low_variance_resampling_enabled", true);
+                editor.putBoolean("manual_direction_enabled", false);
                 editor.putBoolean("compass_is_true_direction", true);
                 editor.commit();
 

@@ -98,7 +98,8 @@ public class ParticleFilter {
          //float roomParticleCount = Math.round(room.getArea() * numberOfParticles / overallArea);
          while(initializedParticles < Math.round(cummulativeRoomParticleCount)) {
             double posX  = drawRandomInRange(r, room.getBottomLeftCorner().getX(), room.getTopRightCorner().getX());
-            double posY  = drawRandomInRange(r, room.getBottomLeftCorner().getY(), room.getTopRightCorner().getY());
+
+             double posY  = drawRandomInRange(r, room.getBottomLeftCorner().getY(), room.getTopRightCorner().getY());
             Position p = new Position(posX, posY);
 
             particles[initializedParticles] = new Particle(p, p, defaultWeight);
@@ -144,9 +145,6 @@ public class ParticleFilter {
          x_relative = length * Math.sin(direction_rad);
          y_relative = length * Math.cos(direction_rad);
 
-         //x_relative = overloadWithRandomError(r, x_relative);
-         //y_relative = overloadWithRandomError(r, y_relative);
-
          particle.moveRelative(x_relative, y_relative);
       }
    }
@@ -187,42 +185,6 @@ public class ParticleFilter {
         }
     }
 
-
-    public void resampleParticles() {
-        Particle[] resampledParticles = new Particle[numberOfParticles];
-
-        // compute particle cdf
-        double[] cdf = new double[numberOfParticles];
-        cdf[0] = 0.0;
-        for (int i = 1; i < numberOfParticles; i++) {
-            cdf[i] = cdf[i - 1] + particles[i].getWeight();
-        }
-
-        Random rng = new Random();
-        double p_step = 1.0 / numberOfParticles; // probability step size for resampling (new sample weight)
-        double p_resample = (rng.nextDouble() - 1) * p_step;
-        int cdf_idx = 0;
-
-        for (int i = 0; i < numberOfParticles; i++) {
-            p_resample += p_step;
-
-            while (cdf_idx < (numberOfParticles - 1) && (p_resample > cdf[cdf_idx] || particles[cdf_idx].getWeight() == 0.0)) {
-                cdf_idx++;
-            }
-
-            // if the resample particle weight is 0.0 (should only occur for the last part of the
-            // cdf) then we take a
-            // particle with non-zero weight..
-            if (particles[cdf_idx].getWeight() == 0.0)
-                resampledParticles[i] = new Particle(resampledParticles[i - 1]);
-            else
-                resampledParticles[i] = new Particle(particles[cdf_idx]);
-
-            resampledParticles[i].setWeight(p_step);
-        }
-
-        particles = resampledParticles;
-    }
 
     /**
      * notes on resampling mostly from: Probabilistic Robotics (Sebastian Thrun, Wolfram Burgard, Dieter Fox; Year: 2005)
@@ -341,7 +303,6 @@ public class ParticleFilter {
              } while(!validParticle);
          }
       }
-
     }
 
     /**
