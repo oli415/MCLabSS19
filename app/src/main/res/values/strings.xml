@@ -3,7 +3,9 @@
     <string name="label_accelerometer">Accelerometer: x=%1$.2f, y=%2$.2f, z=%3$.2f</string>
     <string name="label_prediction">Prediction</string>
     <string name="label_record">Record Activities</string>
-    <string name="label_prediction_status_disabled">The prediction is currently\n not running</string>
+    <string name="label_prediction_status_disabled">No prediction available yet</string>
+    <string name="label_position_not_evaluated">The position hasn\'t been evaluated yet</string>
+    <string name="label_room_not_evaluated">The room hasn\'t been evaluated yet</string>
     <string name="label_record_status_disabled">Recording stopped</string>
     <string name="label_log_default">Logging area</string>
     <string name="label_direction_default">Direction:</string>
@@ -24,9 +26,11 @@
     <string name="title_activity_wifi">WifiActivity</string>
     <string name="title_wifi_scanner">WiFi Scanner</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="label_settings_step_length">step length</string>
-    <string name="label_settings_step_periode">step periode</string>
-    <string name="label_settings_direction_offset">direction offset</string>
+    <string name="label_settings_step_length">step length (in m)</string>
+    <string name="label_settings_step_periode">step periode (in ms)</string>
+    <string name="label_settings_direction_offset">direction offset (in °)</string>
+    <string name="label_settings_length_uncertainty">length uncertainty (in %)</string>
+    <string name="label_settings_direction_uncertainty">direction uncertainty (in °)</string>
     <string name="label_settings_low_variance_resampling">Low-variance Particle Resampling</string>
     <string name="label_settings_manual_direction">Manual Direction Input</string>
     <string name="label_settings_compass_true_north">Compass Visualization Direction/North</string>

@@ -29,37 +29,58 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintVertical_bias="0.1"
         app:srcCompat="@drawable/floorplan" />
 
 
     <TextView
         android:id="@+id/textDirection"
-        android:layout_width="152dp"
-        android:layout_height="67dp"
+        android:layout_width="250dp"
+        android:layout_height="25dp"
         android:text="@string/label_direction_default"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.032"
-        app:layout_constraintVertical_bias="0.999"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="8pt"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.059"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.850" />
 
     <TextView
         android:id="@+id/textPrediction"
-        android:layout_width="191dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="250dp"
+        android:layout_height="25dp"
         android:text="@string/label_prediction_status_disabled"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="@+id/btnPredict"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.527"
-        app:layout_constraintStart_toEndOf="@+id/textDirection"
-        app:layout_constraintTop_toTopOf="@+id/textDirection"
+        android:textAlignment="textStart"
+        android:textSize="8pt"
+        app:layout_constraintStart_toStartOf="@+id/textDirection"
+        app:layout_constraintTop_toBottomOf="@+id/textDirection"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textPosition"
+        android:layout_width="250dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="0dp"
+        android:text="@string/label_position_not_evaluated"
+        android:textAlignment="textStart"
+        android:textSize="8pt"
+        app:layout_constraintStart_toStartOf="@+id/textPrediction"
+        app:layout_constraintTop_toBottomOf="@+id/textPrediction"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textRoom"
+        android:layout_width="250dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="0dp"
+        android:text="@string/label_room_not_evaluated"
+        android:textAlignment="textStart"
+        android:textSize="8pt"
+        app:layout_constraintStart_toStartOf="@+id/textPrediction"
+        app:layout_constraintTop_toBottomOf="@+id/textPosition"
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
@@ -109,8 +130,8 @@
 
     <ImageView
         android:id="@+id/imageViewCompassNeedle"
-        android:layout_width="118dp"
-        android:layout_height="118dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"

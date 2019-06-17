@@ -27,4 +27,8 @@ public class Room {
             return a;
         }
     }
+
+    public int getId() {
+        return id;
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.activitymonitoring;
 
-import android.os.Handler;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -25,33 +24,48 @@ import java.util.Random;
  */
 public class ParticleFilter {
 //   float stepFrequency = 1.0f; //in s
-   float stepLength = 1.0f; //m feasible stride length 0.5 to 1.2 m  /   up to 10% variation during walk for user
-
-   int numberOfParticles = 10000; //TODO check that in paper
+    private double stepLength = 1.0f; //m feasible stride length 0.5 to 1.2 m  /   up to 10% variation during walk for user
+    private int numberOfParticles = 10000; //TODO not hardcode here
+    private int lengthUncertaintyInPercent = 10;   //initialized from preferences
+    private int directionUncertaintyInDegrees = 40; //initialized form preferences
 
    Floor floor;
-
    MotionEstimation movement;
 
+   private Particle particles[];
+   private Position currentPosition;
 
-    private Handler step_event_handler;
 
-
-   public Particle[] getParticles() {
-      return particles;
-   }
-
-   Particle particles[];
-
-   public Position currentPosition;
-
-   ParticleFilter() {
+   ParticleFilter(double stepLengthInMeters, int lengthUncertaintyInPercent, int directionUncertaintyInDegrees) {
       this.floor = new Floor();
       this.particles = new Particle[numberOfParticles];
       currentPosition = new Position();
 
+      this.stepLength = stepLengthInMeters;
+      this.lengthUncertaintyInPercent = lengthUncertaintyInPercent;
+      this.directionUncertaintyInDegrees = directionUncertaintyInDegrees;
+
       initializeParticles();
    }
+
+
+    /**
+     * returns array of particles
+     * @return array of particles
+     */
+   public Particle[] getParticles() {
+      return particles;
+   }
+
+
+    /**
+     * returns the position which is updated after each resampling as median of the particles
+     * @return
+     */
+   public Position getCurrentPosition() {
+       return currentPosition;
+   }
+
 
    /**
     * draws a random double in the range between min and max
@@ -63,6 +77,7 @@ public class ParticleFilter {
    private double drawRandomInRange(Random r, double min, double max) {
       return min + r.nextDouble() *(max- min);
    }
+
 
    /**
     * ramdomly distributes paritcles at the whole floor
@@ -93,7 +108,7 @@ public class ParticleFilter {
       Log.i("particleFiler", String.format("initialized %d", initializedParticles));
    }
 
-   //TODO move to appropriate class?
+
    /**
     * add +/- 10% random noise to value
     * @param r initialized Random
@@ -101,26 +116,35 @@ public class ParticleFilter {
     * @return the value with noise
     */
    public double overloadWithRandomError(Random r, double x) {
-       float error = 0.1f;
+       double error = (double)lengthUncertaintyInPercent / 100.0d;
        x = x + (r.nextDouble() - 0.5) * error * 2 * x;
        return  x;
    }
 
    /**
-    * moves all particles one step in the given direction
+    * moves all particles one step in the given direction, adds additonal noise to sensor values
     * @param direction
     */
-   //TODO add some randomness
    public void moveParticles(double direction) {
        Random r = new Random();
-       double direction_rad = Math.toRadians(direction);
-       double x_relative = stepLength * Math.sin(direction_rad);
-       double y_relative = stepLength * Math.cos(direction_rad);
-
-       x_relative = overloadWithRandomError(r, x_relative);
-       y_relative = overloadWithRandomError(r, y_relative);
+       double length = stepLength;
+       double direction_rad;
+       double x_relative;
+       double y_relative;
+       double particleDirection;
 
        for( Particle particle : particles) {
+         //overload with error
+         length = overloadWithRandomError(r, length);
+         particleDirection =  direction + directionUncertaintyInDegrees * r.nextGaussian();
+
+         direction_rad = Math.toRadians(particleDirection);
+         x_relative = length * Math.sin(direction_rad);
+         y_relative = length * Math.cos(direction_rad);
+
+         //x_relative = overloadWithRandomError(r, x_relative);
+         //y_relative = overloadWithRandomError(r, y_relative);
+
          particle.moveRelative(x_relative, y_relative);
       }
    }
@@ -146,6 +170,7 @@ public class ParticleFilter {
 
    }
 
+
     public void normalizeWeights() {
         double totalWeight = 0.0;
 
@@ -159,6 +184,7 @@ public class ParticleFilter {
             particle.setWeight(particle.getWeight() / totalWeight);
         }
     }
+
 
     public void resampleParticles() {
         Particle[] resampledParticles = new Particle[numberOfParticles];
@@ -291,6 +317,7 @@ public class ParticleFilter {
         }
         this.particles = newParticles;
     }
+
 
     /**
      * randomly for samples that were invalidated randomly draws a new one

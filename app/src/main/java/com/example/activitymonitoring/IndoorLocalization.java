@@ -49,6 +49,8 @@ static int accCount=0, magCount=0; //TODO remove
 //Gui-Stuff
     private TextView mDirectionTextView;
     private TextView mPredictionTextView;
+    private TextView mPositionTextView;
+    private TextView mRoomTextView;
     //---
     private Button btnDrawRooms;
     private Button btnClearImage;
@@ -80,6 +82,8 @@ static int accCount=0, magCount=0; //TODO remove
     Floor floor;
     FloorMap floorMap;
     ParticleFilter particleFilter;
+    private Position currentPosition;
+    private int currentRoomId;
 
     boolean executeLocalization = false;
     boolean isInMotion = false;
@@ -103,6 +107,12 @@ static int accCount=0, magCount=0; //TODO remove
         stepPeriode = preferences.getInt("step_frequency", 0);
         directionOffset = preferences.getInt("direction_offset", 0);
 
+        double stepLengthMeter = (double)preferences.getInt("step_length", 0) / 1000.0d;
+        int directionUncertainty = preferences.getInt("direction_uncertainty", 0);
+        int lengthUncertainty = preferences.getInt("length_uncertainty", 0);
+
+
+
         manualDirectionEnabled = preferences.getBoolean("manual_direction_enabled", false);
         lowVarianceResamplingEnabled = preferences.getBoolean("low_variance_resampling_enabled", false);
         compassDirectionIsTrueDirection = preferences.getBoolean("compass_is_true_direction", true);
@@ -112,6 +122,8 @@ static int accCount=0, magCount=0; //TODO remove
         mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         mDirectionTextView = findViewById(R.id.textDirection);
         mPredictionTextView = findViewById(R.id.textPrediction);
+        mPositionTextView = findViewById(R.id.textRoom);
+        mRoomTextView = findViewById(R.id.textRoom);
 
 
         // If msensors is null, the sensor is not available in the device.
@@ -142,7 +154,7 @@ static int accCount=0, magCount=0; //TODO remove
             directionSeekBar.setVisibility(View.INVISIBLE);
         }
 
-        particleFilter = new ParticleFilter();
+        particleFilter = new ParticleFilter(stepLengthMeter, lengthUncertainty, directionUncertainty);
 
         motionEstimation = new MotionEstimation();
 
@@ -159,9 +171,10 @@ static int accCount=0, magCount=0; //TODO remove
         btnDrawRooms.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                floorMap.drawRooms(floor.rooms);
+                floorMap.drawRooms(floor.rooms, 0);
             }
         });
+        btnDrawRooms.setVisibility(View.INVISIBLE);
 
         btnClearImage= findViewById(R.id.btnClearImage);
         btnClearImage.setOnClickListener(new View.OnClickListener() {
@@ -170,6 +183,7 @@ static int accCount=0, magCount=0; //TODO remove
                 floorMap.clearImage();
             }
         });
+        btnClearImage.setVisibility(View.INVISIBLE);
 
         btnStart= findViewById(R.id.btnStart);
         btnStart.setOnClickListener(new View.OnClickListener() {
@@ -193,6 +207,7 @@ static int accCount=0, magCount=0; //TODO remove
             public void onClick(View view) {
                 executeLocalization = false;
                 particleFilter.initializeParticles();
+                floorMap.clearImage();
             }
 
         });
@@ -255,13 +270,13 @@ static int accCount=0, magCount=0; //TODO remove
                 float needle_direction;
                 if(compassDirectionIsTrueDirection) {
                      needle_direction = degreeExponentialMovingAverageCorrected;
-                } else {
+                } else { //display north
                     needle_direction = -degreeExponentialMovingAverageCorrected;  //todo for manual mode value with correction not that useful, but here it is in general not that useful
                 }
                 compassNeedleImageView.setRotation(needle_direction);
 
                 if(magCount == 10)  {
-                    mDirectionTextView.setText(String.format("Direction: %f", degreeExponentialMovingAverage));
+                    mDirectionTextView.setText(String.format("Direction: %f", degreeExponentialMovingAverageCorrected));
                    magCount = 0;
                 }
             default:
@@ -277,7 +292,8 @@ static int accCount=0, magCount=0; //TODO remove
 
         //TODO consider offloading this to orientation class?
         if (mLastAccelerometerSet && mLastMagnetometerSet) {
-            Log.i("sensor", String.format("acc: %d      magnet: %d", accCount, magCount));
+//            Log.i("sensor", String.format("acc: %d      magnet: %d", accCount, magCount));
+
             /*
             SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
             Log.i("sensor", String.format("acc: x:%f, y:%f, z:%f ------magneto: x:%f, y:%f, z:%f",
@@ -341,7 +357,7 @@ static int accCount=0, magCount=0; //TODO remove
         public void run() {
             MotionEstimation.Activity currentActivity = motionEstimation.estimate();
             //mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity.name()));
-            mPredictionTextView.setText(String.format("you are:\n %s", currentActivity.name()));
+            mPredictionTextView.setText(String.format("you are: %s", currentActivity.name()));
 
             if (!executeLocalization) {
                 return;
@@ -377,9 +393,15 @@ static int accCount=0, magCount=0; //TODO remove
                 }
 
                 particleFilter.updateCurrentPosition();
+                currentPosition = particleFilter.getCurrentPosition();
+                currentRoomId = floor.getRoomIdForPosition(currentPosition);
+
+                mPositionTextView.setText(String.format("Position: x:%f,  y:%f", currentPosition.getX(), currentPosition.getY()));
+                mRoomTextView.setText(String.format("Room: %d", currentRoomId));
 
                 floorMap.clearImage();
-                floorMap.drawParticles(particleFilter.getParticles(), particleFilter.currentPosition);
+                floorMap.drawRooms(floor.rooms, currentRoomId);
+                floorMap.drawParticles(particleFilter.getParticles(), particleFilter.getCurrentPosition());
 
                 stepExecutionHandler.postDelayed(this, stepPeriode);
                 //stepExecutionHandler.removeCallbacks(stepExecutionThread);

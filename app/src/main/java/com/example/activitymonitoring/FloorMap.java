@@ -85,7 +85,7 @@ public class FloorMap {
         imageView.setImageBitmap(liveFloorMap);
     }
 
-    public void drawRooms(ArrayList<Room> rooms) {
+    public void drawRooms(ArrayList<Room> rooms, int highlightRoomId) {
         Paint paint = new Paint();
         //paint.setColor(Color.GREEN);
         //TODO transparent: https://stackoverflow.com/questions/30169507/android-how-to-set-color-value-to-transparent
@@ -94,7 +94,15 @@ public class FloorMap {
         paint.setStrokeWidth(5.0f);
 
         for(Room room : rooms) {
-           drawRoom(room, paint);
+            if(room.getId() == highlightRoomId) {
+                paint.setColor(Color.parseColor("#55FF2200"));
+                paint.setStrokeWidth(15.0f);
+                drawRoom(room, paint);
+                paint.setColor(Color.parseColor("#5500FFFF"));
+                paint.setStrokeWidth(5.0f);
+                Log.i("floormap", String.format("highligth room", highlightRoomId));
+            }
+            drawRoom(room, paint);
         }
         imageView.setImageBitmap(liveFloorMap);
     }

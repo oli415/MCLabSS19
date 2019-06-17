@@ -46,4 +46,20 @@ public class Floor {
         }
         return area;
     }
+
+    public int getRoomIdForPosition(Position pos) {
+       int room_id = 99999;
+
+        for( Room room : rooms) {
+            if(room.getBottomLeftCorner().getX() < pos.getX()
+            && room.getBottomLeftCorner().getY() < pos.getY()
+            && room.getTopRightCorner().getX() > pos.getX()
+            && room.getTopRightCorner().getY() > pos.getY()) {
+                room_id = room.getId();
+                break;
+            }
+        }
+
+        return room_id;
+    }
 }

@@ -4,14 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -24,13 +23,18 @@ public class Settings extends AppCompatActivity {
     EditText stepLengthEditText;
     EditText stepPeriodeEditText;
     EditText directionOffsetEditText;
+    EditText directionUncertaintyEditText;
+    EditText lengthUncertaintyEditText;
     Switch enableManualDirection;
     Switch enableLowVarianceResampling;
     Switch enableCompassTrueDirection;  //else north
+    Button btnReset;
 
     int stepLengthmm;
     int stepPeriodems;
     int directionOffset;
+    int directionUncertainty;
+    int lengthUncertainty;
     boolean manualDirectionEnabled;
     boolean lowVarianceResamplingEnabled;
     boolean compassDirectionIsTrueDirection;
@@ -48,39 +52,15 @@ public class Settings extends AppCompatActivity {
         stepLengthEditText= (EditText)findViewById(R.id.editTextStepLength);
         stepPeriodeEditText= (EditText)findViewById(R.id.editTextStepPeriode);
         directionOffsetEditText = (EditText)findViewById(R.id.editTextDirectionOffset);
+        directionUncertaintyEditText = (EditText)findViewById(R.id.editTextDirectionUncertainty);
+        lengthUncertaintyEditText = (EditText)findViewById(R.id.editTextLengthUncertainty);
         enableManualDirection = findViewById(R.id.switchManualDirection);
         enableLowVarianceResampling = findViewById(R.id.switchStatistical);
         enableCompassTrueDirection = findViewById(R.id.switchCompassTrueNorth);
 
-        stepLengthmm = sharedPreferences.getInt("step_length", 0);
-        stepPeriodems = sharedPreferences.getInt("step_periode", 0);
-        directionOffset = sharedPreferences.getInt("direction_offset", 0);
-        manualDirectionEnabled = sharedPreferences.getBoolean("manual_direction_enabled", false);
-        lowVarianceResamplingEnabled = sharedPreferences.getBoolean("low_variance_resampling_enabled", true);
-        compassDirectionIsTrueDirection = sharedPreferences.getBoolean("compass_is_true_direction", true);
+        loadPreferences();
+        updateSettingElements();
 
-        stepLengthEditText.setText(String.format("%d", stepLengthmm));
-        stepPeriodeEditText.setText(String.format("%d", stepPeriodems));
-        directionOffsetEditText.setText(String.format("%d", directionOffset));
-        enableManualDirection.setChecked(manualDirectionEnabled);
-        enableLowVarianceResampling.setChecked(lowVarianceResamplingEnabled);
-        enableCompassTrueDirection.setChecked(compassDirectionIsTrueDirection);
-
-        if(manualDirectionEnabled) {
-            enableManualDirection.setText(R.string.switch_manual_magnetometer_1);
-        } else {
-            enableManualDirection.setText(R.string.switch_manual_magnetometer_2);
-        }
-        if(lowVarianceResamplingEnabled) {
-            enableLowVarianceResampling.setText(R.string.switch_particles_low_variance_resampling_1);
-        } else {
-            enableLowVarianceResampling.setText(R.string.switch_particles_low_variance_resampling_2);
-        }
-        if(compassDirectionIsTrueDirection) {
-            enableCompassTrueDirection.setText(R.string.switch_compass_direction_true_north_1);
-        } else {
-            enableCompassTrueDirection.setText(R.string.switch_compass_direction_true_north_2);
-        }
 
         stepLengthEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -159,6 +139,62 @@ public class Settings extends AppCompatActivity {
             }
         });
 
+        directionUncertaintyEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                try {
+                    directionUncertainty = Integer.parseInt(directionUncertaintyEditText.getText().toString());
+                }catch (Exception e) {
+                    Log.i("settings", String.format("parsed invalid direction uncertainty %d\n", directionUncertainty));
+                }
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("direction_uncertainty", directionUncertainty);
+                editor.commit();
+                Log.i("settings", String.format("direction uncertainty changed %d\n", directionUncertainty));
+
+            }
+        });
+
+        lengthUncertaintyEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                try {
+                    lengthUncertainty = Integer.parseInt(lengthUncertaintyEditText.getText().toString());
+                }catch (Exception e) {
+                    Log.i("settings", String.format("parsed invalid length uncertainty %d\n", lengthUncertainty));
+                }
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("length_uncertainty", lengthUncertainty);
+                editor.commit();
+                Log.i("settings", String.format("length uncertainty changed %d\n", lengthUncertainty));
+
+            }
+        });
+
+
+
         enableManualDirection.setOnCheckedChangeListener(   new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 manualDirectionEnabled = enableManualDirection.isChecked();
@@ -205,16 +241,77 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        btnReset = findViewById(R.id.btnReset);
+        btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //sharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("step_length", 600);
+                editor.putInt("step_periode",  800);
+                editor.putInt("direction_offset", 30); //TODO
+                editor.putInt("direction_uncertainty", 40); //TODO
+                editor.putInt("length_uncertainty", 10);
+                editor.putBoolean("manual_direction_enabled", false);
+                editor.putBoolean("low_variance_resampling_enabled", true);
+                editor.putBoolean("compass_is_true_direction", true);
+                editor.commit();
+
+                loadPreferences();
+                updateSettingElements();
             }
         });
+
+        //FloatingActionButton fab = findViewById(R.id.fab);
+        //fab.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View view) {
+        //        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+        //                .setAction("Action", null).show();
+        //    }
+        //});
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    public void updateSettingElements() {
+        stepLengthEditText.setText(String.format("%d", stepLengthmm));
+        stepPeriodeEditText.setText(String.format("%d", stepPeriodems));
+        directionOffsetEditText.setText(String.format("%d", directionOffset));
+        directionUncertaintyEditText.setText(String.format("%d", directionUncertainty));
+        lengthUncertaintyEditText.setText(String.format("%d", lengthUncertainty));
+
+        enableManualDirection.setChecked(manualDirectionEnabled);
+        enableLowVarianceResampling.setChecked(lowVarianceResamplingEnabled);
+        enableCompassTrueDirection.setChecked(compassDirectionIsTrueDirection);
+
+        if(manualDirectionEnabled) {
+            enableManualDirection.setText(R.string.switch_manual_magnetometer_1);
+        } else {
+            enableManualDirection.setText(R.string.switch_manual_magnetometer_2);
+        }
+        if(lowVarianceResamplingEnabled) {
+            enableLowVarianceResampling.setText(R.string.switch_particles_low_variance_resampling_1);
+        } else {
+            enableLowVarianceResampling.setText(R.string.switch_particles_low_variance_resampling_2);
+        }
+        if(compassDirectionIsTrueDirection) {
+            enableCompassTrueDirection.setText(R.string.switch_compass_direction_true_north_1);
+        } else {
+            enableCompassTrueDirection.setText(R.string.switch_compass_direction_true_north_2);
+        }
+
+    }
+
+    public void loadPreferences() {
+        stepLengthmm = sharedPreferences.getInt("step_length", 0);
+        stepPeriodems = sharedPreferences.getInt("step_periode", 0);
+        directionOffset = sharedPreferences.getInt("direction_offset", 0);
+        directionUncertainty = sharedPreferences.getInt("direction_uncertainty", 0);
+        lengthUncertainty = sharedPreferences.getInt("length_uncertainty", 0);
+
+        manualDirectionEnabled = sharedPreferences.getBoolean("manual_direction_enabled", false);
+        lowVarianceResamplingEnabled = sharedPreferences.getBoolean("low_variance_resampling_enabled", true);
+        compassDirectionIsTrueDirection = sharedPreferences.getBoolean("compass_is_true_direction", true);
     }
 
 }
