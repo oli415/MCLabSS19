@@ -126,7 +126,8 @@ public class ParticleFilter {
     * @param direction
     */
    public void moveParticles(double direction) {
-       Random r = new Random();
+       Random r_len = new Random();
+       Random r_dir = new Random();
        double length = stepLength;
        double direction_rad;
        double x_relative;
@@ -135,8 +136,9 @@ public class ParticleFilter {
 
        for( Particle particle : particles) {
          //overload with error
-         length = overloadWithRandomError(r, length);
-         particleDirection =  direction + directionUncertaintyInDegrees * r.nextGaussian();
+         //length = overloadWithRandomError(r, length);
+         length = stepLength + 2.0 * lengthUncertaintyInPercent/100 * stepLength * (r_len.nextDouble() - 0.5);
+         particleDirection =  direction + directionUncertaintyInDegrees * r_dir.nextGaussian();
 
          direction_rad = Math.toRadians(particleDirection);
          x_relative = length * Math.sin(direction_rad);
@@ -306,12 +308,13 @@ public class ParticleFilter {
                 cummulativeWeightOldParticles += this.particles[indexOldParticles].getWeight();
             }
 
-            Log.i("particleFilter", String.format("oldI %d, newI %d,  oldWeight %f   newWeight %f", indexOldParticles, indexNew, cummulativeWeightOldParticles , cummulativeWeightNewParticles));
-            if (particles[indexOldParticles].getWeight() == 0.0) {
-                newParticles[indexNew] = new Particle(this.particles[indexOldParticles -1]);
-            } else {
-                newParticles[indexNew] = new Particle(this.particles[indexOldParticles]);
+            //Log.i("particleFilter", String.format("oldI %d, newI %d,  oldWeight %f   newWeight %f", indexOldParticles, indexNew, cummulativeWeightOldParticles , cummulativeWeightNewParticles));
+            int i = 0;
+            while(particles[indexOldParticles - i].getWeight() == 0.0) {
+                i++;
             }
+            newParticles[indexNew] = new Particle(this.particles[indexOldParticles]);
+
             newParticles[indexNew].setWeight(singleNewWeight);
             cummulativeWeightNewParticles += singleNewWeight;
         }

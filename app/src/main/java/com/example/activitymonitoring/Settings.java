@@ -21,7 +21,7 @@ public class Settings extends AppCompatActivity {
     SharedPreferences sharedPreferences;
 
     EditText stepLengthEditText;
-    EditText stepPeriodeEditText;
+    EditText stepPeriodEditText;
     EditText directionOffsetEditText;
     EditText directionUncertaintyEditText;
     EditText lengthUncertaintyEditText;
@@ -31,7 +31,7 @@ public class Settings extends AppCompatActivity {
     Button btnReset;
 
     int stepLengthmm;
-    int stepPeriodems;
+    int stepPeriodms;
     int directionOffset;
     int directionUncertainty;
     int lengthUncertainty;
@@ -50,7 +50,7 @@ public class Settings extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
 
         stepLengthEditText= (EditText)findViewById(R.id.editTextStepLength);
-        stepPeriodeEditText= (EditText)findViewById(R.id.editTextStepPeriode);
+        stepPeriodEditText = (EditText)findViewById(R.id.editTextStepPeriode);
         directionOffsetEditText = (EditText)findViewById(R.id.editTextDirectionOffset);
         directionUncertaintyEditText = (EditText)findViewById(R.id.editTextDirectionUncertainty);
         lengthUncertaintyEditText = (EditText)findViewById(R.id.editTextLengthUncertainty);
@@ -88,7 +88,7 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        stepPeriodeEditText.addTextChangedListener(new TextWatcher() {
+        stepPeriodEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 //
@@ -101,15 +101,15 @@ public class Settings extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 try {
-                    stepPeriodems = Integer.parseInt(stepPeriodeEditText.getText().toString());
+                    stepPeriodms = Integer.parseInt(stepPeriodEditText.getText().toString());
                 }catch (Exception e) {
-                    Log.i("settings", String.format("parsed invalid stepPeriode %d\n", stepPeriodems));
+                    Log.i("settings", String.format("parsed invalid stepPeriod %d\n", stepPeriodms));
                 }
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("step_periode", stepPeriodems);
+                editor.putInt("step_period", stepPeriodms);
                 editor.commit();
-                Log.i("settings", String.format("step-periode changed %d\n", stepPeriodems));
+                Log.i("settings", String.format("step-period changed %d\n", stepPeriodms));
             }
         });
 
@@ -248,7 +248,7 @@ public class Settings extends AppCompatActivity {
                 //sharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("step_length", 600);
-                editor.putInt("step_periode",  800);
+                editor.putInt("step_period",  800);
                 editor.putInt("direction_offset", 30); //TODO
                 editor.putInt("direction_uncertainty", 40); //TODO
                 editor.putInt("length_uncertainty", 10);
@@ -275,7 +275,7 @@ public class Settings extends AppCompatActivity {
 
     public void updateSettingElements() {
         stepLengthEditText.setText(String.format("%d", stepLengthmm));
-        stepPeriodeEditText.setText(String.format("%d", stepPeriodems));
+        stepPeriodEditText.setText(String.format("%d", stepPeriodms));
         directionOffsetEditText.setText(String.format("%d", directionOffset));
         directionUncertaintyEditText.setText(String.format("%d", directionUncertainty));
         lengthUncertaintyEditText.setText(String.format("%d", lengthUncertainty));
@@ -304,7 +304,7 @@ public class Settings extends AppCompatActivity {
 
     public void loadPreferences() {
         stepLengthmm = sharedPreferences.getInt("step_length", 0);
-        stepPeriodems = sharedPreferences.getInt("step_periode", 0);
+        stepPeriodms = sharedPreferences.getInt("step_period", 0);
         directionOffset = sharedPreferences.getInt("direction_offset", 0);
         directionUncertainty = sharedPreferences.getInt("direction_uncertainty", 0);
         lengthUncertainty = sharedPreferences.getInt("length_uncertainty", 0);

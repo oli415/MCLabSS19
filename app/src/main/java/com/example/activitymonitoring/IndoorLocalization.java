@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -104,7 +105,7 @@ static int accCount=0, magCount=0; //TODO remove
         appContext = MainActivity.getAppContext();
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         motion_prediction_event_update_delay = preferences.getInt("predict_intervall_ms", 0);
-        stepPeriode = preferences.getInt("step_frequency", 0);
+        stepPeriode = preferences.getInt("step_period", 0);
         directionOffset = preferences.getInt("direction_offset", 0);
 
         double stepLengthMeter = (double)preferences.getInt("step_length", 0) / 1000.0d;
@@ -211,7 +212,29 @@ static int accCount=0, magCount=0; //TODO remove
             }
 
         });
-    }
+
+   }
+
+    //@Override
+    //public void onBackPressed() {
+    //    Log.i("indoor", "####################backPressed\n");
+    //    executeLocalization = false;
+    //    super.onBackPressed();
+    //}
+
+    @Override
+   public boolean onKeyDown(int keyCode, KeyEvent event)  {
+            if (keyCode == KeyEvent.KEYCODE_BACK ) {
+                // do something on back.
+                executeLocalization = false;
+                Log.i("indoor", "backbutton\n");
+                return super.onKeyDown(keyCode, event);
+                //return true;
+            }
+
+            return super.onKeyDown(keyCode, event);
+   }
+
 
     @Override
     protected void onPause() {
@@ -235,11 +258,14 @@ static int accCount=0, magCount=0; //TODO remove
             case Sensor.TYPE_ACCELEROMETER:
                 //for motion estimation:
                 //TODO forward not all acceleration values as we do sample now at 10th speed
-                motionEstimation.addAccelerationValues(event.values[0], event.values[1], event.values[2]);
+                accCount = accCount +1;
+                //if(accCount == 10) {
+                    motionEstimation.addAccelerationValues(event.values[0], event.values[1], event.values[2]);
+                //    accCount = 0;
+                //}
                 //for orientation:
                 System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
                 mLastAccelerometerSet = true; //TODO are they reset anywhere?
-//                accCount++;
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
                 System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
@@ -359,17 +385,16 @@ static int accCount=0, magCount=0; //TODO remove
             //mPredictionTextView.setText(String.format("Based on the accelerometer\n data it is likely that you are:\n %s", currentActivity.name()));
             mPredictionTextView.setText(String.format("you are: %s", currentActivity.name()));
 
-            if (!executeLocalization) {
-                return;
-            }
 
-            if(isInMotion == false && isActivityMotion(currentActivity) == true) {
+            if(executeLocalization && isInMotion == false && isActivityMotion(currentActivity) == true) {
                 isInMotion = true;
                 stepExecutionHandler.postDelayed(stepExecutionThread, stepPeriode);
                 //stepTimer.scheduleAtFixedRate(motionEstimationThread, stepFrequency, stepFrequency); //TODO should we run it all the time or only on start button press
 
-            } else if (isInMotion == true && isActivityMotion(currentActivity) == false){
+            } else if ( isInMotion == true &&( !executeLocalization || isActivityMotion(currentActivity) == false)){
                 isInMotion = false;
+                stepExecutionHandler.removeCallbacks(stepExecutionThread);
+                Log.i("indoorLocalization", "stopping");
                 //step timer is stopped in stepExecutionThread
                 //TODO end walking
                 }
@@ -387,8 +412,8 @@ static int accCount=0, magCount=0; //TODO remove
 
                 //particleFilter.resampleParticles();
                 if(lowVarianceResamplingEnabled) {
-                    //particleFilter.lowVarianceSampler();
-                    particleFilter.resampleParticles();
+                    particleFilter.lowVarianceSampler();
+                    //particleFilter.resampleParticles();
                 } else {
                     particleFilter.randomSampler();
                 }
@@ -399,6 +424,7 @@ static int accCount=0, magCount=0; //TODO remove
 
                 mPositionTextView.setText(String.format("Position: x:%f,  y:%f", currentPosition.getX(), currentPosition.getY()));
                 mRoomTextView.setText(String.format("Room: %d", currentRoomId));
+                Log.i("indoorLocalization", String.format("executed one step periode: %d",stepPeriode ));
 
                 floorMap.clearImage();
                 floorMap.drawRooms(floor.rooms, currentRoomId);
